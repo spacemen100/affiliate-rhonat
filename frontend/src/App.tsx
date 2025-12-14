@@ -1,9 +1,11 @@
 
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Links from './pages/Links';
 import Products from './pages/Products';
+import ClickBank from './pages/ClickBank';
 import { useAuth } from './hooks/useAuth';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
@@ -39,6 +41,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <Products />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/clickbank"
+          element={
+            <PrivateRoute>
+              <ClickBank />
             </PrivateRoute>
           }
         />

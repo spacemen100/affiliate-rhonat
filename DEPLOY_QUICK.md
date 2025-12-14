@@ -1,6 +1,6 @@
 # 🚀 Scripts de Déploiement Rapide
 
-## Déploiement Backendd
+## Déploiement Backend
 
 ```bash
 # Depuis la racine du projet

@@ -7,6 +7,7 @@ export default function Sidebar() {
       <Link to="/dashboard" className="hover:underline">Dashboard</Link>
       <Link to="/links" className="hover:underline">Mes liens</Link>
       <Link to="/products" className="hover:underline">Produits</Link>
+      <Link to="/clickbank" className="hover:underline font-semibold text-blue-600">📊 ClickBank Analytics</Link>
     </aside>
   );
 }

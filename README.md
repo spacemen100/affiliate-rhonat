@@ -2,6 +2,19 @@
 
 Bienvenue dans la documentation complète de l'intégration ClickBank ! Ce fichier vous guide vers les bonnes ressources selon vos besoins.
 
+## 🎉 État du Déploiement
+
+### Backend ✅ DÉPLOYÉ
+- **URL** : `https://affiliate-rhonat-ujyn.vercel.app`
+- **Status** : En production
+- **Endpoints** : Health, Orders, Products, Analytics
+
+### Frontend ⏳ À DÉPLOYER
+- **Configuration** : ✅ Prête (`.env` configurés)
+- **Prochaine étape** : Tester en local puis déployer
+
+👉 **Voir [NEXT_STEPS.md](./NEXT_STEPS.md) pour les prochaines actions**
+
 ## 🚀 Par où commencer ?
 
 ### Vous débutez ? Suivez cet ordre :
