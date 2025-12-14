@@ -118,3 +118,16 @@ $RECYCLE.BIN/
 # Supabase
 .supabase/
 
+# Vercel
+.vercel
+.vercel/
+*.vercel.json.backup
+
+# Backend serverless
+backend-serverless/.vercel
+backend-serverless/node_modules
+
+# Frontend
+frontend/.vercel
+frontend/node_modules
+frontend/dist
