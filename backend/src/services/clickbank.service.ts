@@ -42,13 +42,13 @@ class ClickBankService {
 
     /**
      * Génère les headers d'authentification pour ClickBank
-     * ClickBank utilise une authentification basique avec Dev Key et API Key
+     * ClickBank utilise une authentification avec la clé API complète (incluant le préfixe API-)
      */
     private generateAuthHeaders(): Record<string, string> {
-        // ClickBank utilise une authentification basique
-        // Format: "DEV_KEY:API_KEY" encodé en base64
-        const credentials = `${this.devKey}:${this.apiKey}`;
-        const encodedCredentials = Buffer.from(credentials).toString('base64');
+        // ClickBank utilise Basic Auth avec la clé API complète
+        // La clé doit inclure le préfixe "API-" si présent
+        // Format: Basic base64(API_KEY)
+        const encodedCredentials = Buffer.from(this.apiKey).toString('base64');
 
         return {
             Authorization: `Basic ${encodedCredentials}`,
