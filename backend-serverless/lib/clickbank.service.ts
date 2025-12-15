@@ -123,8 +123,8 @@ class ClickBankService {
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
 
-            console.log('[ClickBankService] Making API request to /rest/1.3/orders');
-            const response = await this.axiosInstance.get('/rest/1.3/orders', {
+            console.log('[ClickBankService] Making API request to /rest/1.3/orders2/list');
+            const response = await this.axiosInstance.get('/rest/1.3/orders2/list', {
                 params,
             });
 
