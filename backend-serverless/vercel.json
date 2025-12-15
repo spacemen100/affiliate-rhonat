@@ -11,12 +11,5 @@
             "src": "/api/(.*)",
             "dest": "/api/$1"
         }
-    ],
-    "env": {
-        "CLICKBANK_DEV_KEY": "@clickbank-dev-key",
-        "CLICKBANK_API_KEY": "@clickbank-api-key",
-        "CLICKBANK_CLERK_KEY": "@clickbank-clerk-key",
-        "CLICKBANK_BASE_URL": "https://api.clickbank.com",
-        "FRONTEND_URL": "@frontend-url"
-    }
+    ]
 }
