@@ -12,7 +12,7 @@ import { supabase } from '../api/supabase';
 
 const BASE_GO_URL =
   import.meta.env.VITE_BASE_GO_URL?.replace(/\/$/, '') ??
-  'https://affiliate-rhonat.vercel.app/go';
+  'https://affiliate-rhonat-3c2b.vercel.app/go';
 
 export default function Links() {
   const { user } = useAuth();

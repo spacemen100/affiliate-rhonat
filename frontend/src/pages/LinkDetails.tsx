@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import { getAffiliateLinkDetail } from '../api/links';
 
 const BASE_GO_URL =
-  import.meta.env.VITE_BASE_GO_URL?.replace(/\/$/, '') ?? 'https://affiliate-rhonat.vercel.app/go';
+  import.meta.env.VITE_BASE_GO_URL?.replace(/\/$/, '') ?? 'https://affiliate-rhonat-3c2b.vercel.app/go';
 
 export default function LinkDetails() {
   const { id } = useParams();
