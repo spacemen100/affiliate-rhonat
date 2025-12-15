@@ -2,7 +2,7 @@
 
 ## Problème actuel
 
-L'URL Supabase actuelle (`https://ionoburxknruxedgivno.supabase.co`) ne fonctionne pas.
+L'URL Supabase actuelle est : `https://etkeimmyqfangzyrajqx.supabase.co`
 Erreur : "Failed to fetch" - Le serveur DNS ne peut pas résoudre cette URL.
 
 ## Solution : Créer/Configurer un projet Supabase
@@ -31,7 +31,7 @@ Erreur : "Failed to fetch" - Le serveur DNS ne peut pas résoudre cette URL.
 Créez un fichier `.env.local` dans le dossier `frontend` :
 
 ```bash
-VITE_SUPABASE_URL=https://votre-projet-id.supabase.co
+VITE_SUPABASE_URL=https://etkeimmyqfangzyrajqx.supabase.co
 VITE_SUPABASE_ANON_KEY=votre-anon-key-ici
 ```
 
@@ -97,7 +97,7 @@ Pour la production (Vercel), ajoutez les variables d'environnement dans :
 **Vercel Dashboard** → **Settings** → **Environment Variables**
 
 ```
-VITE_SUPABASE_URL=https://votre-projet-id.supabase.co
+VITE_SUPABASE_URL=https://etkeimmyqfangzyrajqx.supabase.co
 VITE_SUPABASE_ANON_KEY=votre-anon-key-ici
 ```
 
