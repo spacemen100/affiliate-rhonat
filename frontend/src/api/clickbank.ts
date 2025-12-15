@@ -7,6 +7,14 @@
  * - Créer des liens d'affiliation (HopLinks)
  */
 
+import {
+  CLICKBANK_API_PATH,
+  DEFAULT_DEV_KEY,
+  stripApiKeyPrefix,
+  buildHopLink,
+  MAX_PAGINATION_PAGES,
+} from '../config/clickbank.config';
+
 const envVars =
   typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env : {};
 
@@ -19,8 +27,7 @@ const CLICKBANK_API_BASE_URL =
 //   https://affiliate-rhonat-delta.vercel.app/api/clickbank/...
 // ce qui évite les erreurs CORS côté navigateur tout en utilisant
 // exclusivement le backend déployé.
-const CLICKBANK_PROXY_URL = '/api/clickbank';
-const DEFAULT_DEV_KEY = 'API-KM27URMQL9C2275OIUEIX7FBMX4NHIM6VCHT';
+const CLICKBANK_PROXY_URL = CLICKBANK_API_PATH;
 
 function buildOrdersUrl(filters: OrderFilters) {
   const params = new URLSearchParams();
@@ -77,15 +84,15 @@ async function fetchWithFallback(
   hostedProxyUrl?: string
 ) {
   // #region agent log
-  const logData1 = {location:'clickbank.ts:52',message:'fetchWithFallback entry',data:{url,fallbackUrl,hasHeaders:!!init.headers},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
+  const logData1 = { location: 'clickbank.ts:52', message: 'fetchWithFallback entry', data: { url, fallbackUrl, hasHeaders: !!init.headers }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' };
   console.log('[DEBUG]', logData1);
-  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData1)}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData1) }).catch(() => { });
   // #endregion
   try {
     // #region agent log
-    const logData2 = {location:'clickbank.ts:54',message:'before fetch attempt',data:{url,method:init.method},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
+    const logData2 = { location: 'clickbank.ts:54', message: 'before fetch attempt', data: { url, method: init.method }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' };
     console.log('[DEBUG]', logData2);
-    fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData2)}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData2) }).catch(() => { });
     // #endregion
 
     const candidates = [url];
@@ -96,9 +103,9 @@ async function fetchWithFallback(
       candidates.push(fallbackUrl);
     }
     // #region agent log
-    const logCandidates = {location:'clickbank.ts:95',message:'candidates built',data:{candidates,count:candidates.length,url,hostedProxyUrl,fallbackUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+    const logCandidates = { location: 'clickbank.ts:95', message: 'candidates built', data: { candidates, count: candidates.length, url, hostedProxyUrl, fallbackUrl }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'B' };
     console.log('[DEBUG]', logCandidates);
-    fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logCandidates)}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logCandidates) }).catch(() => { });
     // #endregion
 
     let lastError: any = null;
@@ -111,31 +118,31 @@ async function fetchWithFallback(
           (res.status === 500 || res.status === 502 || res.status === 503 || res.status === 404 || res.status === 401) &&
           targetUrl !== candidates[candidates.length - 1];
         // #region agent log
-        const logRetryCheck = {location:'clickbank.ts:108',message:'retry check',data:{status:res.status,ok:res.ok,shouldRetry,isLastCandidate:targetUrl === candidates[candidates.length - 1],targetUrl,candidateIndex:candidates.indexOf(targetUrl),totalCandidates:candidates.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+        const logRetryCheck = { location: 'clickbank.ts:108', message: 'retry check', data: { status: res.status, ok: res.ok, shouldRetry, isLastCandidate: targetUrl === candidates[candidates.length - 1], targetUrl, candidateIndex: candidates.indexOf(targetUrl), totalCandidates: candidates.length }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'B' };
         console.log('[DEBUG]', logRetryCheck);
-        fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logRetryCheck)}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logRetryCheck) }).catch(() => { });
         // #endregion
         if (shouldRetry) {
           // #region agent log
-          const logDataRetry = {location:'clickbank.ts:107',message:'retrying with fallback due to error status',data:{status:res.status,targetUrl,nextCandidate:candidates[candidates.indexOf(targetUrl) + 1]},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+          const logDataRetry = { location: 'clickbank.ts:107', message: 'retrying with fallback due to error status', data: { status: res.status, targetUrl, nextCandidate: candidates[candidates.indexOf(targetUrl) + 1] }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'B' };
           console.log('[DEBUG]', logDataRetry);
-          fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logDataRetry)}).catch(()=>{});
+          fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logDataRetry) }).catch(() => { });
           // #endregion
           lastError = new Error(`Upstream error ${res.status} on ${targetUrl}`);
           continue;
         }
         // #region agent log
-        const logData3 = {location:'clickbank.ts:126',message:'after fetch',data:{status:res.status,ok:res.ok,statusText:res.statusText,url:res.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
+        const logData3 = { location: 'clickbank.ts:126', message: 'after fetch', data: { status: res.status, ok: res.ok, statusText: res.statusText, url: res.url }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' };
         console.log('[DEBUG]', logData3);
-        fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData3)}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData3) }).catch(() => { });
         // #endregion
         return res;
       } catch (err) {
         lastError = err;
         // #region agent log
-        const logDataErr = {location:'clickbank.ts:122',message:'fetch error in loop',data:{errorMessage:err instanceof Error?err.message:String(err),targetUrl,hasMoreCandidates:targetUrl !== candidates[candidates.length - 1],candidateIndex:candidates.indexOf(targetUrl)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
+        const logDataErr = { location: 'clickbank.ts:122', message: 'fetch error in loop', data: { errorMessage: err instanceof Error ? err.message : String(err), targetUrl, hasMoreCandidates: targetUrl !== candidates[candidates.length - 1], candidateIndex: candidates.indexOf(targetUrl) }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' };
         console.log('[DEBUG]', logDataErr);
-        fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logDataErr)}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logDataErr) }).catch(() => { });
         // #endregion
         // Try the next candidate when connection fails (e.g., ECONNREFUSED on :3001)
         if (targetUrl !== candidates[candidates.length - 1]) {
@@ -151,9 +158,9 @@ async function fetchWithFallback(
     throw new Error('Unknown fetch failure');
   } catch (err) {
     // #region agent log
-    const logData5 = {location:'clickbank.ts:64',message:'fetch error caught',data:{errorMessage:err instanceof Error?err.message:String(err),errorName:err instanceof Error?err.name:'Unknown',hasFallback:!!fallbackUrl,fallbackUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
+    const logData5 = { location: 'clickbank.ts:64', message: 'fetch error caught', data: { errorMessage: err instanceof Error ? err.message : String(err), errorName: err instanceof Error ? err.name : 'Unknown', hasFallback: !!fallbackUrl, fallbackUrl }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' };
     console.log('[DEBUG]', logData5);
-    fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData5)}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logData5) }).catch(() => { });
     // #endregion
     // Provide helpful error message if proxy server isn't available
     if (url.includes('/api/') && err instanceof TypeError && err.message.includes('Failed to fetch')) {
@@ -191,10 +198,10 @@ function normalizeOrdersPayload(payload: any): Order[] {
 
 function normalizeAnalyticsPayload(payload: any): ClickData[] {
   if (!payload) return [];
-  
+
   // Handle the format from working example: {"rows":{"row":[...]}}
   let rows: any[] = [];
-  
+
   if (payload.rows?.row) {
     // Format: {"rows":{"row":[...]}} - from vendor dimension
     rows = Array.isArray(payload.rows.row) ? payload.rows.row : (payload.rows.row ? [payload.rows.row] : []);
@@ -215,20 +222,20 @@ function normalizeAnalyticsPayload(payload: any): ClickData[] {
     // Handle vendor dimension format: {"dimensionValue":"mitolyn","data":[...]}
     const dimensionValue = row.dimensionValue || row.trackingId || row.tracking_id || row.tid || row.tracking || '';
     const dataArray = row.data || [];
-    
+
     // Extract metrics from data array format: [{"attribute":"HOP_COUNT","value":{"$":"5"}}]
     const metrics: any = {};
     if (Array.isArray(dataArray)) {
       dataArray.forEach((item: any) => {
         if (item.attribute && item.value) {
-          const value = typeof item.value === 'object' && item.value.$ !== undefined 
-            ? item.value.$ 
+          const value = typeof item.value === 'object' && item.value.$ !== undefined
+            ? item.value.$
             : item.value;
           metrics[item.attribute.toLowerCase()] = Number(value) || 0;
         }
       });
     }
-    
+
     return {
       trackingId: dimensionValue,
       vendor: row.dimensionValue || dimensionValue, // For vendor dimension
@@ -359,18 +366,14 @@ export async function getOrders(
   filters: OrderFilters = {}
 ): Promise<OrdersResponse> {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'clickbank.ts:215',message:'getOrders entry',data:{hasApiKey:!!config.apiKey,filters,CLICKBANK_PROXY_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'clickbank.ts:215', message: 'getOrders entry', data: { hasApiKey: !!config.apiKey, filters, CLICKBANK_PROXY_URL }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'C' }) }).catch(() => { });
   // #endregion
-  let apiKey = config.apiKey || DEFAULT_DEV_KEY;
-  // Strip "API-" prefix if present to avoid double prefix
-  if (apiKey.startsWith('API-')) {
-    apiKey = apiKey.substring(4);
-  }
+  const apiKey = stripApiKeyPrefix(config.apiKey || DEFAULT_DEV_KEY);
   const page = filters.page || 1;
 
   const proxyUrl = buildOrdersUrl(filters);
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'clickbank.ts:220',message:'getOrders URLs built',data:{proxyUrl,usesVercelBackend:true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'clickbank.ts:220', message: 'getOrders URLs built', data: { proxyUrl, usesVercelBackend: true }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
   // #endregion
 
   try {
@@ -390,8 +393,8 @@ export async function getOrders(
         typeof payload === 'string'
           ? payload
           : payload
-          ? JSON.stringify(payload)
-          : rawText || response.statusText;
+            ? JSON.stringify(payload)
+            : rawText || response.statusText;
       throw new Error(`ClickBank API Error (${response.status}): ${errorText}`);
     }
 
@@ -432,8 +435,8 @@ export async function getAllOrders(
     page++;
 
     // Limite de sécurité pour éviter les boucles infinies
-    if (page > 1000) {
-      console.warn('Pagination limit reached (1000 pages)');
+    if (page > MAX_PAGINATION_PAGES) {
+      console.warn(`Pagination limit reached (${MAX_PAGINATION_PAGES} pages)`);
       break;
     }
   }
@@ -453,13 +456,9 @@ export async function getClicksAnalytics(
   filters: AnalyticsFilters = {}
 ): Promise<AnalyticsResponse> {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'clickbank.ts:391',message:'getClicksAnalytics entry',data:{hasApiKey:!!config.apiKey,filters,CLICKBANK_PROXY_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'clickbank.ts:391', message: 'getClicksAnalytics entry', data: { hasApiKey: !!config.apiKey, filters, CLICKBANK_PROXY_URL }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'C' }) }).catch(() => { });
   // #endregion
-  let apiKey = config.apiKey || DEFAULT_DEV_KEY;
-  // Strip "API-" prefix if present to avoid double prefix
-  if (apiKey.startsWith('API-')) {
-    apiKey = apiKey.substring(4);
-  }
+  const apiKey = stripApiKeyPrefix(config.apiKey || DEFAULT_DEV_KEY);
 
   const proxyUrl = buildAnalyticsUrl(filters);
   const role = filters.role || 'AFFILIATE';
@@ -467,10 +466,10 @@ export async function getClicksAnalytics(
   const roleLower = role.toLowerCase();
   const dimensionLower = dimension.toLowerCase();
   const directUrl = `${CLICKBANK_API_BASE_URL}/1.3/analytics/${roleLower}/${dimensionLower}`;
-  
+
   // Build fallback URL with query params
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'clickbank.ts:410',message:'getClicksAnalytics URLs built',data:{proxyUrl,role,dimension,usesVercelBackend:true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  fetch('http://127.0.0.1:7242/ingest/a2f4ff67-11fb-447c-ab87-7f5519201c61', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'clickbank.ts:410', message: 'getClicksAnalytics URLs built', data: { proxyUrl, role, dimension, usesVercelBackend: true }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
   // #endregion
 
   try {
@@ -489,8 +488,8 @@ export async function getClicksAnalytics(
         typeof payload === 'string'
           ? payload
           : payload
-          ? JSON.stringify(payload)
-          : rawText || response.statusText;
+            ? JSON.stringify(payload)
+            : rawText || response.statusText;
       throw new Error(`ClickBank API Error (${response.status}): ${errorText}`);
     }
 
@@ -532,8 +531,7 @@ export async function createAffiliateLink(
   }
 
   // Construction de l'URL du HopLink selon le format ClickBank
-  // Format: https://[NICKNAME_AFFILIATE].vendornickname.hop.clickbank.net/?tid=[TRACKING_ID]
-  const hopLinkUrl = `https://${affiliateNickname}.${vendorNickname}.hop.clickbank.net/?tid=${encodeURIComponent(trackingId)}`;
+  const hopLinkUrl = buildHopLink(affiliateNickname, vendorNickname, trackingId);
 
   const link: AffiliateLink = {
     url: hopLinkUrl,

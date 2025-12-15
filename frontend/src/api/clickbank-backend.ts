@@ -1,16 +1,17 @@
 /**
  * API frontend vers le backend ClickBank déployé sur Vercel
- * (ex: https://affiliate-rhonat-delta.vercel.app).
+ * (https://affiliate-rhonat-delta.vercel.app).
  *
  * Ce backend agrège déjà les données ClickBank (ventes, CA, commissions, ...),
  * ce qui évite d'appeler directement l'API ClickBank depuis le navigateur.
+ * 
+ * En développement, Vite proxy redirige /api/clickbank vers le backend Vercel.
+ * En production, les requêtes /api/clickbank sont servies directement par Vercel.
  */
 
-const envVars =
-  typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env : {};
-
-const BACKEND_BASE_URL =
-  envVars.VITE_CLICKBANK_BACKEND_URL || 'https://affiliate-rhonat-delta.vercel.app';
+// Utilisation de chemins relatifs pour profiter du proxy Vite en dev
+// et du routing Vercel en production
+const BACKEND_BASE_URL = '';
 
 export interface BackendOrderCustomerAddress {
   firstName: string;
