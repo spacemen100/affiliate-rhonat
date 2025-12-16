@@ -114,11 +114,11 @@ router.get('/products/:id', async (req: Request, res: Response) => {
 /**
  * GET /api/clickbank/analytics
  * Récupère les analytics/statistiques
- * Query params: startDate, endDate (requis)
+ * Query params: startDate, endDate (requis), role, dimension, tid, account, select (optionnels)
  */
 router.get('/analytics', async (req: Request, res: Response) => {
     try {
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate, role, dimension, tid, account, select } = req.query;
 
         if (!startDate || !endDate) {
             return res.status(400).json({
@@ -129,7 +129,14 @@ router.get('/analytics', async (req: Request, res: Response) => {
 
         const analytics = await clickBankService.getAnalytics(
             startDate as string,
-            endDate as string
+            endDate as string,
+            {
+                role: role as string,
+                dimension: dimension as string,
+                tid: tid as string,
+                account: account as string,
+                select: select as string,
+            }
         );
 
         // Vérifier si c'est une erreur

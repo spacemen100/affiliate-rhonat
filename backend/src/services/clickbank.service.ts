@@ -134,36 +134,56 @@ class ClickBankService {
      * Récupère les analytics/statistiques
      * @param startDate - Date de début
      * @param endDate - Date de fin
+     * @param options - Options supplémentaires (role, dimension, tid, account, select)
      */
     async getAnalytics(
         startDate: string,
         endDate: string,
-        account: string = 'freenzy'
-    ): Promise<ClickBankAnalytics | ClickBankError> {
+        options?: {
+            role?: string;
+            dimension?: string;
+            tid?: string;
+            account?: string;
+            select?: string;
+        }
+    ): Promise<any | ClickBankError> {
         try {
-            // Utiliser l'endpoint affiliate avec le paramètre account
-            const response = await this.axiosInstance.get(
-                '/rest/1.3/analytics/affiliate/vendor',
-                {
-                    params: {
-                        account,
-                        startDate,
-                        endDate,
-                        select: 'HOP_COUNT,SALE_COUNT',
-                    },
-                }
-            );
+            // Valeurs par défaut
+            const role = (options?.role || 'AFFILIATE').toLowerCase();
+            const dimension = (options?.dimension || 'TRACKING_ID').toLowerCase();
+            const account = options?.account || 'freenzy';
+            const select = options?.select || 'HOP_COUNT,SALE_COUNT';
 
-            return {
-                totalSales: response.data.totals?.SALE_COUNT || 0,
-                totalCommissions: 0,
-                totalOrders: response.data.totals?.HOP_COUNT || 0,
-                period: {
-                    startDate,
-                    endDate,
-                },
+            // Construction de l'URL de l'endpoint
+            const endpoint = `/rest/1.3/analytics/${role}/${dimension}`;
+
+            // Construction des paramètres de requête
+            const params: Record<string, string> = {
+                startDate,
+                endDate,
+                select,
             };
+
+            // Ajouter le paramètre account si la dimension est vendor
+            if (dimension === 'vendor') {
+                params.account = account;
+            }
+
+            // Ajouter le tracking ID si fourni
+            if (options?.tid) {
+                params.tid = options.tid;
+            }
+
+            console.log(`[ClickBank Service] Calling ${endpoint} with params:`, params);
+
+            const response = await this.axiosInstance.get(endpoint, { params });
+
+            console.log(`[ClickBank Service] Response status:`, response.status);
+
+            // Retourner la réponse brute pour que le frontend puisse la traiter
+            return response.data;
         } catch (error) {
+            console.error('[ClickBank Service] Error in getAnalytics:', error);
             return this.handleError(error);
         }
     }
