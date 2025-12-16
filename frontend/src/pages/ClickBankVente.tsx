@@ -172,10 +172,31 @@ export default function ClickBankVente() {
                 </div>
             </div>
 
+            {/* Message d'information */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                    <span className="text-2xl">ℹ️</span>
+                    <div className="flex-1">
+                        <h3 className="font-semibold text-blue-900 mb-2">Endpoint en cours de configuration</h3>
+                        <p className="text-sm text-blue-800 mb-2">
+                            L'endpoint ClickBank pour récupérer les ventes est en cours de configuration.
+                            L'API ClickBank nécessite des paramètres spécifiques qui sont en cours de vérification.
+                        </p>
+                        <p className="text-sm text-blue-800">
+                            <strong>Alternative:</strong> Vous pouvez consulter vos ventes directement sur le
+                            <a href="https://accounts.clickbank.com" target="_blank" rel="noopener noreferrer" className="underline ml-1">
+                                portail ClickBank
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
             {toast && (
                 <div className={`p-4 rounded-lg ${toast.type === 'error' ? 'bg-red-50 text-red-800' :
-                        toast.type === 'success' ? 'bg-green-50 text-green-800' :
-                            'bg-blue-50 text-blue-800'
+                    toast.type === 'success' ? 'bg-green-50 text-green-800' :
+                        'bg-blue-50 text-blue-800'
                     }`}>
                     <div className="flex items-center justify-between">
                         <span className="text-sm">{toast.message}</span>
@@ -304,8 +325,8 @@ export default function ClickBankVente() {
                                             </td>
                                             <td className="p-3 text-center">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${order.transactionType === 'SALE' ? 'bg-green-100 text-green-800' :
-                                                        order.transactionType === 'RFND' ? 'bg-red-100 text-red-800' :
-                                                            'bg-gray-100 text-gray-800'
+                                                    order.transactionType === 'RFND' ? 'bg-red-100 text-red-800' :
+                                                        'bg-gray-100 text-gray-800'
                                                     }`}>
                                                     {order.transactionType}
                                                 </span>
