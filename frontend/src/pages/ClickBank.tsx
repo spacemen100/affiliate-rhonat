@@ -1,7 +1,4 @@
 import { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
-import Toast from '../components/Toast';
 
 // ============================================================================
 // TYPES ET INTERFACES
@@ -252,193 +249,192 @@ export default function Clickbank() {
 
 
   return (
-    <div className="app-background flex gap-6">
-      <Sidebar />
-      <div className="w-full space-y-4">
-        <Navbar />
-        <main className="page-surface p-6 w-full flex flex-col gap-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm text-gray-500 font-medium">Connecteur partenaires</p>
-              <h1 className="text-2xl font-bold">ClickBank</h1>
-            </div>
-            <span className="badge-soft">Nouveau</span>
+    <div className="space-y-4">
+      {/* Toast */}
+      {toast && (
+        <div className={`p-4 rounded-lg ${toast.type === 'error' ? 'bg-red-50 text-red-800' :
+          toast.type === 'success' ? 'bg-green-50 text-green-800' :
+            'bg-blue-50 text-blue-800'
+          }`}>
+          <div className="flex items-center justify-between">
+            <span className="text-sm">{toast.message}</span>
+            <button onClick={() => setToast(null)} className="text-sm font-medium hover:underline">
+              Fermer
+            </button>
           </div>
+        </div>
+      )}
 
-          {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-
-          {/* Section Statistiques de clics */}
-          <section className="card p-5 space-y-4">
+      {/* Section Statistiques de clics */}
+      <section className="card p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Statistiques de clics</h2>
+            <p className="text-sm text-gray-600">Récupérez les détails des clics par Tracking ID</p>
+          </div>
+          <button
+            onClick={handleGetClicks}
+            disabled={loadingClicks || !developerKey}
+            className="btn-primary text-sm"
+          >
+            {loadingClicks ? 'Chargement...' : 'Récupérer les clics'}
+          </button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-gray-700">Date de début (yyyy-mm-dd)</span>
+            <input
+              type="date"
+              className="input"
+              value={analyticsFilters.startDate}
+              onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, startDate: e.target.value })}
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-gray-700">Date de fin (yyyy-mm-dd)</span>
+            <input
+              type="date"
+              className="input"
+              value={analyticsFilters.endDate}
+              onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, endDate: e.target.value })}
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-gray-700">Dimension</span>
+            <select
+              className="input"
+              value={analyticsFilters.dimension}
+              onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, dimension: e.target.value })}
+            >
+              <option value="vendor">vendor</option>
+              <option value="TRACKING_ID">TRACKING_ID</option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-gray-700">
+              Account (vendor) — requis pour la dimension vendor
+            </span>
+            <input
+              className="input"
+              placeholder="ex: freenzy"
+              value={analyticsFilters.account}
+              onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, account: e.target.value })}
+            />
+          </label>
+          <label className="flex flex-col gap-1 md:col-span-2">
+            <span className="text-sm font-medium text-gray-700">Metrics (select)</span>
+            <input
+              className="input"
+              placeholder="HOP_COUNT,SALE_COUNT"
+              value={analyticsFilters.select}
+              onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, select: e.target.value })}
+            />
+          </label>
+        </div>
+        {clicksData && (
+          <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold">Statistiques de clics</h2>
-                <p className="text-sm text-gray-600">Récupérez les détails des clics par Tracking ID</p>
+              <h3 className="text-sm font-semibold">Résultats ({clicksData.data.length} Vendor(s))</h3>
+              <div className="text-xs text-gray-500">
+                Période: {clicksData.period.startDate} → {clicksData.period.endDate}
               </div>
-              <button
-                onClick={handleGetClicks}
-                disabled={loadingClicks || !developerKey}
-                className="btn-primary text-sm"
-              >
-                {loadingClicks ? 'Chargement...' : 'Récupérer les clics'}
-              </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Date de début (yyyy-mm-dd)</span>
-                <input
-                  type="date"
-                  className="input"
-                  value={analyticsFilters.startDate}
-                  onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, startDate: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Date de fin (yyyy-mm-dd)</span>
-                <input
-                  type="date"
-                  className="input"
-                  value={analyticsFilters.endDate}
-                  onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, endDate: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Dimension</span>
-                <select
-                  className="input"
-                  value={analyticsFilters.dimension}
-                  onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, dimension: e.target.value })}
-                >
-                  <option value="vendor">vendor</option>
-                  <option value="TRACKING_ID">TRACKING_ID</option>
-                </select>
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">
-                  Account (vendor) — requis pour la dimension vendor
-                </span>
-                <input
-                  className="input"
-                  placeholder="ex: freenzy"
-                  value={analyticsFilters.account}
-                  onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, account: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1 md:col-span-2">
-                <span className="text-sm font-medium text-gray-700">Metrics (select)</span>
-                <input
-                  className="input"
-                  placeholder="HOP_COUNT,SALE_COUNT"
-                  value={analyticsFilters.select}
-                  onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, select: e.target.value })}
-                />
-              </label>
+
+            {/* Statistiques globales */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="text-xs text-blue-600 font-medium mb-1">Total Clics</div>
+                <div className="text-2xl font-bold text-blue-700">
+                  {clicksData.data.reduce((sum, item) => sum + item.hops, 0)}
+                </div>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="text-xs text-green-600 font-medium mb-1">Total Ventes</div>
+                <div className="text-2xl font-bold text-green-700">
+                  {clicksData.data.reduce((sum, item) => sum + item.sales, 0)}
+                </div>
+              </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="text-xs text-purple-600 font-medium mb-1">Taux de Conversion</div>
+                <div className="text-2xl font-bold text-purple-700">
+                  {(() => {
+                    const totalHops = clicksData.data.reduce((sum, item) => sum + item.hops, 0);
+                    const totalSales = clicksData.data.reduce((sum, item) => sum + item.sales, 0);
+                    return totalHops > 0 ? ((totalSales / totalHops) * 100).toFixed(2) : '0.00';
+                  })()}%
+                </div>
+              </div>
             </div>
-            {clicksData && (
-              <div className="mt-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">Résultats ({clicksData.data.length} Vendor(s))</h3>
-                  <div className="text-xs text-gray-500">
-                    Période: {clicksData.period.startDate} → {clicksData.period.endDate}
-                  </div>
-                </div>
 
-                {/* Statistiques globales */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="text-xs text-blue-600 font-medium mb-1">Total Clics</div>
-                    <div className="text-2xl font-bold text-blue-700">
-                      {clicksData.data.reduce((sum, item) => sum + item.hops, 0)}
-                    </div>
-                  </div>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="text-xs text-green-600 font-medium mb-1">Total Ventes</div>
-                    <div className="text-2xl font-bold text-green-700">
-                      {clicksData.data.reduce((sum, item) => sum + item.sales, 0)}
-                    </div>
-                  </div>
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                    <div className="text-xs text-purple-600 font-medium mb-1">Taux de Conversion</div>
-                    <div className="text-2xl font-bold text-purple-700">
-                      {(() => {
-                        const totalHops = clicksData.data.reduce((sum, item) => sum + item.hops, 0);
-                        const totalSales = clicksData.data.reduce((sum, item) => sum + item.sales, 0);
-                        return totalHops > 0 ? ((totalSales / totalHops) * 100).toFixed(2) : '0.00';
-                      })()}%
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tableau des résultats */}
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-gray-100 border-b-2 border-gray-300">
-                        <th className="text-left p-3 text-sm font-semibold text-gray-700">Vendor</th>
-                        <th className="text-right p-3 text-sm font-semibold text-gray-700">Clics</th>
-                        <th className="text-right p-3 text-sm font-semibold text-gray-700">Ventes</th>
-                        <th className="text-right p-3 text-sm font-semibold text-gray-700">Taux Conv.</th>
-                        <th className="text-right p-3 text-sm font-semibold text-gray-700">Revenus</th>
+            {/* Tableau des résultats */}
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100 border-b-2 border-gray-300">
+                    <th className="text-left p-3 text-sm font-semibold text-gray-700">Vendor</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Clics</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Ventes</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Taux Conv.</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Revenus</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clicksData.data.map((item, index) => {
+                    const conversionRate = item.hops > 0 ? ((item.sales / item.hops) * 100).toFixed(2) : '0.00';
+                    return (
+                      <tr
+                        key={index}
+                        className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <span className="font-medium text-gray-900">{item.vendor}</span>
+                          </div>
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {item.hops}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.sales > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                            {item.sales}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${parseFloat(conversionRate) > 0 ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                            {conversionRate}%
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className="text-sm font-medium text-gray-900">
+                            ${item.earnings.toFixed(2)}
+                          </span>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {clicksData.data.map((item, index) => {
-                        const conversionRate = item.hops > 0 ? ((item.sales / item.hops) * 100).toFixed(2) : '0.00';
-                        return (
-                          <tr
-                            key={index}
-                            className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                          >
-                            <td className="p-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                <span className="font-medium text-gray-900">{item.vendor}</span>
-                              </div>
-                            </td>
-                            <td className="p-3 text-right">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {item.hops}
-                              </span>
-                            </td>
-                            <td className="p-3 text-right">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.sales > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                {item.sales}
-                              </span>
-                            </td>
-                            <td className="p-3 text-right">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${parseFloat(conversionRate) > 0 ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-600'
-                                }`}>
-                                {conversionRate}%
-                              </span>
-                            </td>
-                            <td className="p-3 text-right">
-                              <span className="text-sm font-medium text-gray-900">
-                                ${item.earnings.toFixed(2)}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-                {/* JSON brut (collapsible) */}
-                <details className="mt-4">
-                  <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 p-2 bg-gray-100 rounded">
-                    📋 Voir les données JSON brutes
-                  </summary>
-                  <pre className="mt-2 bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-96 border border-gray-200">
-                    {JSON.stringify(clicksData, null, 2)}
-                  </pre>
-                </details>
-              </div>
-            )}
-          </section>
+            {/* JSON brut (collapsible) */}
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 p-2 bg-gray-100 rounded">
+                📋 Voir les données JSON brutes
+              </summary>
+              <pre className="mt-2 bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-96 border border-gray-200">
+                {JSON.stringify(clicksData, null, 2)}
+              </pre>
+            </details>
+          </div>
+        )}
+      </section>
 
-        </main>
-      </div>
     </div>
   );
 }

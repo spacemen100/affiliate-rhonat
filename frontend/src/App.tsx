@@ -12,7 +12,7 @@ import ProductDetails from './pages/ProductDetails';
 import TopAffiliates from './pages/TopAffiliates';
 import Approvals from './pages/Approvals';
 import Payouts from './pages/Payouts';
-import Clickbank from './pages/ClickBank';
+import ClickBankParent from './pages/ClickBankParent';
 import JVZoo from './pages/JVZoo';
 import TestSale from './pages/TestSale';
 import AdminReports from './pages/AdminReports';
@@ -122,7 +122,7 @@ export default function App() {
           path="/clickbank"
           element={
             <PrivateRoute>
-              <Clickbank />
+              <ClickBankParent />
             </PrivateRoute>
           }
         />
