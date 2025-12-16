@@ -22,15 +22,21 @@ router.get('/health', async (req: Request, res: Response) => {
 /**
  * GET /api/clickbank/orders
  * Récupère les commandes ClickBank
- * Query params: startDate, endDate (optionnels)
+ * Query params: startDate, endDate, role, type, affiliate, vendor (optionnels)
  */
 router.get('/orders', async (req: Request, res: Response) => {
     try {
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate, role, type, affiliate, vendor } = req.query;
 
         const orders = await clickBankService.getOrders(
             startDate as string,
-            endDate as string
+            endDate as string,
+            {
+                role: role as string,
+                type: type as string,
+                affiliate: affiliate as string,
+                vendor: vendor as string,
+            }
         );
 
         // Vérifier si c'est une erreur

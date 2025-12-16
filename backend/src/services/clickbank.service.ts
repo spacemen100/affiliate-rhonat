@@ -81,22 +81,40 @@ class ClickBankService {
      * Récupère les commandes
      * @param startDate - Date de début (format: YYYY-MM-DD)
      * @param endDate - Date de fin (format: YYYY-MM-DD)
+     * @param options - Options de filtrage (role, type, affiliate, vendor)
      */
     async getOrders(
         startDate?: string,
-        endDate?: string
+        endDate?: string,
+        options?: {
+            role?: string;
+            type?: string;
+            affiliate?: string;
+            vendor?: string;
+        }
     ): Promise<ClickBankOrder[] | ClickBankError> {
         try {
             const params: Record<string, string> = {};
             if (startDate) params.startDate = startDate;
             if (endDate) params.endDate = endDate;
+            if (options?.role) params.role = options.role;
+            if (options?.type) params.type = options.type;
+            if (options?.affiliate) params.affiliate = options.affiliate;
+            if (options?.vendor) params.vendor = options.vendor;
 
-            const response = await this.axiosInstance.get('/rest/1.3/orders', {
+            console.log('[ClickBank Service] Calling /rest/1.3/orders2/list with params:', params);
+
+            const response = await this.axiosInstance.get('/rest/1.3/orders2/list', {
                 params,
             });
 
-            return response.data.orderData || [];
+            console.log('[ClickBank Service] Orders response status:', response.status);
+
+            // L'API retourne { orderData: [...] } ou directement un tableau
+            const orders = response.data.orderData || response.data || [];
+            return Array.isArray(orders) ? orders : [];
         } catch (error) {
+            console.error('[ClickBank Service] Error in getOrders:', error);
             return this.handleError(error);
         }
     }
