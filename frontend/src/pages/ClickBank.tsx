@@ -2,20 +2,11 @@ import { FormEvent, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import Toast from '../components/Toast';
-import ClickbankRequestPreview from '../components/clickbank/ClickbankRequestPreview';
-import VendorAnalyticsPlayground from '../components/clickbank/VendorAnalyticsPlayground';
-import BackendAnalyticsSummary from '../components/clickbank/BackendAnalyticsSummary';
-import OrdersSummary from '../components/clickbank/OrdersSummary';
 import {
-  getOrders,
-  getAllOrders,
   getClicksAnalytics,
   createAffiliateLink,
-  testConnection,
-  type OrdersResponse,
   type AnalyticsResponse,
   type CreateAffiliateLinkResponse,
-  type ClickBankConnectionResult,
 } from '../api/clickbank';
 
 type ClickbankCredentials = {
@@ -39,31 +30,16 @@ export default function Clickbank() {
   });
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
-  
-  // États pour les tests API
-  const [testingConnection, setTestingConnection] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [loadingOrders, setLoadingOrders] = useState(false);
-  const [ordersData, setOrdersData] = useState<OrdersResponse | null>(null);
+
+  // États pour les statistiques de clics
   const [loadingClicks, setLoadingClicks] = useState(false);
   const [clicksData, setClicksData] = useState<AnalyticsResponse | null>(null);
-  const [loadingVendorAnalytics, setLoadingVendorAnalytics] = useState(false);
-  const [vendorAnalyticsData, setVendorAnalyticsData] = useState<AnalyticsResponse | null>(null);
+
+  // États pour la création de lien
   const [creatingLink, setCreatingLink] = useState(false);
   const [linkData, setLinkData] = useState<CreateAffiliateLinkResponse | null>(null);
-  const [connectionPayload, setConnectionPayload] = useState<OrdersResponse | null>(null);
-  const [connectionError, setConnectionError] = useState<string | null>(null);
-  
-  // États pour les formulaires de test
-  const [orderFilters, setOrderFilters] = useState({
-    startDate: '',
-    endDate: '',
-    type: '',
-    role: '',
-    affiliate: '',
-    vendor: '',
-    tid: '',
-  });
+
+  // États pour les formulaires
   const [analyticsFilters, setAnalyticsFilters] = useState({
     startDate: defaultRange.start,
     endDate: defaultRange.end,
@@ -103,82 +79,6 @@ export default function Clickbank() {
     }, 350);
   }
 
-  // Fonctions de test API
-  async function handleTestConnection() {
-    if (!credentials.developerKey) {
-      setToast({ message: 'Veuillez entrer votre Developer API Key', type: 'error' });
-      return;
-    }
-
-    setTestingConnection(true);
-    setConnectionStatus('idle');
-    setConnectionPayload(null);
-    setConnectionError(null);
-    
-    try {
-      const result: ClickBankConnectionResult = await testConnection({
-        apiKey: credentials.developerKey,
-        developerKey: credentials.developerKey,
-      });
-      
-      setConnectionStatus(result.ok ? 'success' : 'error');
-      if (result.payload) setConnectionPayload(result.payload);
-      if (result.error) setConnectionError(result.error);
-      setToast({
-        message: result.ok ? 'Connexion réussie !' : 'Échec de la connexion',
-        type: result.ok ? 'success' : 'error',
-      });
-    } catch (error: any) {
-      setConnectionStatus('error');
-      setConnectionError(error?.message || String(error));
-      setToast({
-        message: `Erreur de connexion: ${error.message}`,
-        type: 'error',
-      });
-    } finally {
-      setTestingConnection(false);
-    }
-  }
-
-  async function handleGetOrders() {
-    if (!credentials.developerKey) {
-      setToast({ message: 'Veuillez entrer votre Developer API Key', type: 'error' });
-      return;
-    }
-
-    setLoadingOrders(true);
-    setOrdersData(null);
-    
-    try {
-      const filters: any = {};
-      if (orderFilters.startDate) filters.startDate = orderFilters.startDate;
-      if (orderFilters.endDate) filters.endDate = orderFilters.endDate;
-      if (orderFilters.type) filters.type = orderFilters.type;
-      if (orderFilters.role) filters.role = orderFilters.role;
-      if (orderFilters.affiliate) filters.affiliate = orderFilters.affiliate;
-      if (orderFilters.vendor) filters.vendor = orderFilters.vendor;
-      if (orderFilters.tid) filters.tid = orderFilters.tid;
-
-      const response = await getOrders({
-        apiKey: credentials.developerKey,
-        developerKey: credentials.developerKey,
-      }, filters);
-      
-      setOrdersData(response);
-      setToast({
-        message: `${response.orders.length} commande(s) récupérée(s)`,
-        type: 'success',
-      });
-    } catch (error: any) {
-      setToast({
-        message: `Erreur: ${error.message}`,
-        type: 'error',
-      });
-    } finally {
-      setLoadingOrders(false);
-    }
-  }
-
   async function handleGetClicks() {
     if (!credentials.developerKey) {
       setToast({ message: 'Veuillez entrer votre Developer API Key', type: 'error' });
@@ -198,7 +98,7 @@ export default function Clickbank() {
 
     setLoadingClicks(true);
     setClicksData(null);
-    
+
     try {
       const filters: any = {};
       if (analyticsFilters.startDate) filters.startDate = analyticsFilters.startDate;
@@ -215,7 +115,7 @@ export default function Clickbank() {
         role: 'AFFILIATE',
         ...filters,
       });
-      
+
       setClicksData(response);
       setToast({
         message: `Statistiques récupérées pour ${response.data.length} Tracking ID(s)`,
@@ -228,46 +128,6 @@ export default function Clickbank() {
       });
     } finally {
       setLoadingClicks(false);
-    }
-  }
-
-  async function handleGetVendorAnalytics() {
-    if (!credentials.developerKey) {
-      setToast({ message: 'Veuillez entrer votre Developer API Key', type: 'error' });
-      return;
-    }
-
-    setLoadingVendorAnalytics(true);
-    setVendorAnalyticsData(null);
-
-    try {
-      const response = await getClicksAnalytics(
-        {
-          apiKey: credentials.developerKey,
-          developerKey: credentials.developerKey,
-        },
-        {
-          role: 'AFFILIATE',
-          dimension: 'vendor',
-          account: 'freenzy',
-          startDate: '2025-12-01',
-          endDate: '2025-12-11',
-          select: 'HOP_COUNT,SALE_COUNT',
-        }
-      );
-
-      setVendorAnalyticsData(response);
-      setToast({
-        message: `Statistiques vendors récupérées (${response.data.length} ligne(s))`,
-        type: 'success',
-      });
-    } catch (error: any) {
-      setToast({
-        message: `Erreur: ${error.message}`,
-        type: 'error',
-      });
-    } finally {
-      setLoadingVendorAnalytics(false);
     }
   }
 
@@ -284,13 +144,13 @@ export default function Clickbank() {
 
     setCreatingLink(true);
     setLinkData(null);
-    
+
     try {
       const response = await createAffiliateLink({
         apiKey: credentials.developerKey,
         developerKey: credentials.developerKey,
       }, linkForm);
-      
+
       setLinkData(response);
       setToast({
         message: 'Lien d\'affiliation créé avec succès !',
@@ -365,165 +225,6 @@ export default function Clickbank() {
                 </button>
               </div>
             </form>
-          </section>
-
-          {/* Résumé backend (Vercel) : ventes, CA, commissions entre 2 dates */}
-          <BackendAnalyticsSummary />
-
-          {/* Section Test de connexion */}
-          <section className="card p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold">Test de connexion API</h2>
-                <p className="text-sm text-gray-600">Testez votre connexion à l'API ClickBank</p>
-              </div>
-              <button
-                onClick={handleTestConnection}
-                disabled={testingConnection || !credentials.developerKey}
-                className="btn-primary text-sm"
-              >
-                {testingConnection ? 'Test en cours...' : 'Tester la connexion'}
-              </button>
-            </div>
-            {connectionStatus !== 'idle' && (
-              <div className={`p-3 rounded-lg ${connectionStatus === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                {connectionStatus === 'success' ? '✅ Connexion réussie' : '❌ Échec de la connexion'}
-              </div>
-            )}
-            {connectionPayload && (
-              <div className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-80">
-                <div className="font-semibold mb-2">Réponse JSON (orders page 1)</div>
-                {JSON.stringify(connectionPayload, null, 2)}
-              </div>
-            )}
-            {connectionError && (
-              <div className="bg-red-50 p-4 rounded-lg text-xs text-red-800">
-                <div className="font-semibold mb-2">Erreur</div>
-                {connectionError}
-              </div>
-            )}
-          </section>
-
-          <ClickbankRequestPreview />
-
-          <VendorAnalyticsPlayground apiKey={credentials.developerKey} />
-
-          {/* Section Analytics vendor (démonstration depuis clickbankdevelopperkey.md) */}
-          <section className="card p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold">Analytics par vendeur (live)</h2>
-                <p className="text-sm text-gray-600">
-                  Exécute la requête <code>analytics/affiliate/vendor</code> avec l&apos;account <code>freenzy</code> et
-                  les dates du fichier clickbankdevelopperkey.md.
-                </p>
-              </div>
-              <button
-                onClick={handleGetVendorAnalytics}
-                disabled={loadingVendorAnalytics || !credentials.developerKey}
-                className="btn-primary text-sm"
-              >
-                {loadingVendorAnalytics ? 'Chargement...' : 'Exécuter'}
-              </button>
-            </div>
-            <div className="text-sm text-gray-700">
-              <p>
-                Paramètres: startDate=2025-12-01, endDate=2025-12-11, account=freenzy, select=HOP_COUNT,SALE_COUNT,
-                role=AFFILIATE, dimension=vendor.
-              </p>
-            </div>
-            {vendorAnalyticsData && (
-              <div className="mt-3 space-y-2">
-                <h3 className="text-sm font-semibold">Réponse JSON</h3>
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-96">
-                  {JSON.stringify(vendorAnalyticsData, null, 2)}
-                </pre>
-              </div>
-            )}
-          </section>
-
-          {/* Section Récupération des ventes */}
-          <section className="card p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold">Récupérer les ventes</h2>
-                <p className="text-sm text-gray-600">Récupérez les ventes avec tous les détails en JSON</p>
-              </div>
-              <button
-                onClick={handleGetOrders}
-                disabled={loadingOrders || !credentials.developerKey}
-                className="btn-primary text-sm"
-              >
-                {loadingOrders ? 'Chargement...' : 'Récupérer les ventes'}
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Date de début (yyyy-mm-dd)</span>
-                <input
-                  type="date"
-                  className="input"
-                  value={orderFilters.startDate}
-                  onChange={(e) => setOrderFilters({ ...orderFilters, startDate: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Rôle (VENDOR, AFFILIATE)</span>
-                <input
-                  className="input"
-                  placeholder="Ex: AFFILIATE"
-                  value={orderFilters.role}
-                  onChange={(e) => setOrderFilters({ ...orderFilters, role: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Nickname vendeur (vendor)</span>
-                <input
-                  className="input"
-                  placeholder="Ex: freenzy"
-                  value={orderFilters.vendor}
-                  onChange={(e) => setOrderFilters({ ...orderFilters, vendor: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Date de fin (yyyy-mm-dd)</span>
-                <input
-                  type="date"
-                  className="input"
-                  value={orderFilters.endDate}
-                  onChange={(e) => setOrderFilters({ ...orderFilters, endDate: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Type (SALE, RFND, CGBK)</span>
-                <input
-                  className="input"
-                  placeholder="Ex: SALE"
-                  value={orderFilters.type}
-                  onChange={(e) => setOrderFilters({ ...orderFilters, type: e.target.value })}
-                />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Tracking ID</span>
-                <input
-                  className="input"
-                  placeholder="ID de suivi"
-                  value={orderFilters.tid}
-                  onChange={(e) => setOrderFilters({ ...orderFilters, tid: e.target.value })}
-                />
-              </label>
-            </div>
-            {ordersData && (
-              <div className="mt-4">
-                <OrdersSummary ordersResponse={ordersData} />
-                <h3 className="text-sm font-semibold mb-2">
-                  Résultats bruts ({ordersData.orders.length} commande(s)):
-                </h3>
-                <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-96">
-                  {JSON.stringify(ordersData, null, 2)}
-                </pre>
-              </div>
-            )}
           </section>
 
           {/* Section Statistiques de clics */}
@@ -669,71 +370,6 @@ export default function Clickbank() {
                 </pre>
               </div>
             )}
-          </section>
-
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="card p-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">Checklist de connexion</h3>
-                  <p className="text-sm text-gray-600">Vérifiez chaque étape avant de déployer.</p>
-                </div>
-              </div>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="badge-soft">1</span>
-                  Activez les API Keys depuis ClickBank puis collez-les ci-dessus.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="badge-soft">2</span>
-                  Autorisez l'IP de votre backend dans ClickBank si nécessaire.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="badge-soft">3</span>
-                  Planifiez une tâche CRON pour récupérer les ventes et rebills.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="badge-soft">4</span>
-                  Mappez les produits ClickBank vers vos produits internes (SKU/IDs).
-                </li>
-              </ul>
-            </div>
-
-            <div className="card p-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">Statut d'intégration</h3>
-                  <p className="text-sm text-gray-600">Ajustez la synchronisation depuis ClickBank.</p>
-                </div>
-                <span className="badge-soft">Sandbox</span>
-              </div>
-              <dl className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-slate-50 rounded-lg p-3 border">
-                  <dt className="text-gray-500">Dernier appel API</dt>
-                  <dd className="font-semibold text-gray-900">
-                    {connectionStatus === 'success' ? 'Connecté' : connectionStatus === 'error' ? 'Erreur' : 'en attente'}
-                  </dd>
-                </div>
-                <div className="bg-slate-50 rounded-lg p-3 border">
-                  <dt className="text-gray-500">Ventes importées</dt>
-                  <dd className="font-semibold text-gray-900">
-                    {ordersData ? `${ordersData.orders.length} (test)` : '0 (pilotage local)'}
-                  </dd>
-                </div>
-                <div className="bg-slate-50 rounded-lg p-3 border">
-                  <dt className="text-gray-500">Remboursements</dt>
-                  <dd className="font-semibold text-gray-900">Non synchronisés</dd>
-                </div>
-                <div className="bg-slate-50 rounded-lg p-3 border">
-                  <dt className="text-gray-500">Webhook</dt>
-                  <dd className="font-semibold text-gray-900">À configurer</dd>
-                </div>
-              </dl>
-              <p className="text-xs text-gray-500">
-                Cette page conserve vos champs tant que la session reste ouverte. Branchez le stockage sécurisé (Supabase,
-                vault...) pour passer en production.
-              </p>
-            </div>
           </section>
         </main>
       </div>
