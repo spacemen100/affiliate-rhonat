@@ -108,22 +108,92 @@ export default function Conversions() {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const pixelUrl = `${supabaseUrl}/functions/v1/record-sale`;
 
-        // Code HTML du pixel
-        const htmlCode = `<!-- Pixel de conversion - À placer sur la page de confirmation -->
-<img 
-  src="${pixelUrl}?order_id={{ORDER_ID}}&amount={{AMOUNT}}" 
-  width="1" 
-  height="1" 
-  style="display:none;" 
-  alt=""
-/>`;
+        // VERSION 1 : AUTOMATIQUE (RECOMMANDÉ) - Détecte automatiquement les infos
+        const autoCode = `<!-- 🚀 VERSION AUTOMATIQUE (RECOMMANDÉ) - Copier-Coller, c'est tout ! -->
+<!-- À placer sur votre page de confirmation (page "Merci") -->
+<script id="rhonat-conversion-pixel">
+(function() {
+  // 🎯 Détection automatique de l'ID de commande
+  // Le script cherche dans l'URL, les éléments de la page, etc.
+  function detectOrderId() {
+    // Chercher dans l'URL (?order_id=XXX ou ?order=XXX)
+    var urlParams = new URLSearchParams(window.location.search);
+    var orderId = urlParams.get('order_id') || urlParams.get('order') || urlParams.get('transaction_id');
+    
+    if (orderId) return orderId;
+    
+    // Chercher dans les éléments de la page
+    var orderElement = document.querySelector('[data-order-id]') || 
+                      document.querySelector('.order-id') ||
+                      document.querySelector('#order-id');
+    
+    if (orderElement) {
+      return orderElement.getAttribute('data-order-id') || 
+             orderElement.textContent.trim();
+    }
+    
+    // Générer un ID unique si rien trouvé
+    return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  
+  // 💰 Détection automatique du montant
+  function detectAmount() {
+    // Chercher dans l'URL (?amount=XXX ou ?total=XXX)
+    var urlParams = new URLSearchParams(window.location.search);
+    var amount = urlParams.get('amount') || urlParams.get('total') || urlParams.get('price');
+    
+    if (amount) return parseFloat(amount);
+    
+    // Chercher dans les éléments de la page
+    var amountElement = document.querySelector('[data-amount]') || 
+                       document.querySelector('.order-total') ||
+                       document.querySelector('#order-total') ||
+                       document.querySelector('.total-amount');
+    
+    if (amountElement) {
+      var text = amountElement.getAttribute('data-amount') || 
+                 amountElement.textContent;
+      // Extraire le nombre (enlever €, $, etc.)
+      var match = text.match(/[0-9]+([.,][0-9]+)?/);
+      if (match) return parseFloat(match[0].replace(',', '.'));
+    }
+    
+    return 0; // Valeur par défaut
+  }
+  
+  // 📡 Envoi du pixel
+  var orderId = detectOrderId();
+  var amount = detectAmount();
+  
+  console.log('🎯 Pixel de conversion Rhonat:', { orderId: orderId, amount: amount });
+  
+  var img = new Image(1, 1);
+  img.src = '${pixelUrl}?order_id=' + encodeURIComponent(orderId) + '&amount=' + amount;
+  img.style.display = 'none';
+  img.onerror = function() { console.error('❌ Erreur pixel Rhonat'); };
+  img.onload = function() { console.log('✅ Pixel Rhonat chargé'); };
+  document.body.appendChild(img);
+})();
+</script>`;
 
-        // Code JavaScript alternatif
-        const jsCode = `<!-- Alternative JavaScript - Plus fiable -->
+        // VERSION 2 : SEMI-AUTOMATIQUE - Juste indiquer où sont les infos
+        const semiAutoCode = `<!-- 📋 VERSION SEMI-AUTOMATIQUE - Indiquer où sont les infos -->
+<!-- Ajouter data-order-id et data-amount sur vos éléments existants -->
+
+<!-- Exemple 1 : Sur un élément qui affiche l'ID de commande -->
+<p data-order-id="12345">Commande #12345</p>
+
+<!-- Exemple 2 : Sur un élément qui affiche le montant -->
+<p data-amount="99.90">Total : 99,90€</p>
+
+<!-- Puis coller ce script (il détectera automatiquement) -->
 <script>
 (function() {
-  var orderId = '{{ORDER_ID}}'; // Remplacer par l'ID de commande réel
-  var amount = {{AMOUNT}}; // Remplacer par le montant réel
+  var orderElement = document.querySelector('[data-order-id]');
+  var amountElement = document.querySelector('[data-amount]');
+  
+  var orderId = orderElement ? orderElement.getAttribute('data-order-id') : 'ORD-' + Date.now();
+  var amount = amountElement ? parseFloat(amountElement.getAttribute('data-amount')) : 0;
   
   var img = new Image(1, 1);
   img.src = '${pixelUrl}?order_id=' + orderId + '&amount=' + amount;
@@ -132,7 +202,21 @@ export default function Conversions() {
 })();
 </script>`;
 
-        setPixelCode(`${htmlCode}\n\n${jsCode}`);
+        // VERSION 3 : MANUELLE - Pour ceux qui veulent tout contrôler
+        const manualCode = `<!-- ⚙️ VERSION MANUELLE - Contrôle total -->
+<script>
+(function() {
+  var orderId = '{{ORDER_ID}}'; // ⚠️ REMPLACER par votre ID de commande
+  var amount = {{AMOUNT}}; // ⚠️ REMPLACER par le montant (nombre, sans guillemets)
+  
+  var img = new Image(1, 1);
+  img.src = '${pixelUrl}?order_id=' + orderId + '&amount=' + amount;
+  img.style.display = 'none';
+  document.body.appendChild(img);
+})();
+</script>`;
+
+        setPixelCode(`${autoCode}\n\n\n${semiAutoCode}\n\n\n${manualCode}`);
     };
 
     const copyToClipboard = () => {
@@ -258,15 +342,64 @@ export default function Conversions() {
                             )}
 
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <h3 className="font-semibold text-blue-900 mb-2">📌 Instructions d'utilisation</h3>
-                                <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
-                                    <li>Sélectionnez le lien d'affiliation concerné</li>
-                                    <li>Générez le code pixel</li>
-                                    <li>Copiez le code et collez-le sur votre page de confirmation (page "Merci")</li>
-                                    <li>Remplacez <code className="bg-blue-100 px-1 rounded">{'{{ORDER_ID}}'}</code> par l'ID de commande réel</li>
-                                    <li>Remplacez <code className="bg-blue-100 px-1 rounded">{'{{AMOUNT}}'}</code> par le montant de la vente</li>
-                                </ol>
-                                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                                <h3 className="font-semibold text-blue-900 mb-3">📌 3 Versions Disponibles</h3>
+
+                                <div className="space-y-4">
+                                    {/* Version 1 : Automatique */}
+                                    <div className="bg-white border border-green-200 rounded-lg p-3">
+                                        <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                                            🚀 Version 1 : AUTOMATIQUE (Recommandé)
+                                        </h4>
+                                        <p className="text-sm text-gray-700 mb-2">
+                                            <strong>Le plus simple !</strong> Copier-coller le code, c'est tout.
+                                        </p>
+                                        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                                            <li>Détecte automatiquement l'ID de commande dans l'URL ou la page</li>
+                                            <li>Détecte automatiquement le montant dans l'URL ou la page</li>
+                                            <li>Génère un ID unique si rien n'est trouvé</li>
+                                            <li>Aucune modification nécessaire !</li>
+                                        </ul>
+                                        <div className="mt-2 p-2 bg-green-50 rounded text-xs text-green-700">
+                                            ✅ <strong>Parfait pour :</strong> Les partenaires qui veulent la solution la plus simple
+                                        </div>
+                                    </div>
+
+                                    {/* Version 2 : Semi-automatique */}
+                                    <div className="bg-white border border-blue-200 rounded-lg p-3">
+                                        <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                                            📋 Version 2 : SEMI-AUTOMATIQUE
+                                        </h4>
+                                        <p className="text-sm text-gray-700 mb-2">
+                                            Ajouter 2 attributs sur vos éléments HTML existants.
+                                        </p>
+                                        <div className="bg-gray-50 p-2 rounded text-xs font-mono mb-2">
+                                            &lt;p <span className="text-blue-600">data-order-id="12345"</span>&gt;Commande #12345&lt;/p&gt;<br />
+                                            &lt;p <span className="text-blue-600">data-amount="99.90"</span>&gt;Total : 99,90€&lt;/p&gt;
+                                        </div>
+                                        <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                                            ✅ <strong>Parfait pour :</strong> Les partenaires qui ont déjà ces infos affichées sur leur page
+                                        </div>
+                                    </div>
+
+                                    {/* Version 3 : Manuelle */}
+                                    <div className="bg-white border border-orange-200 rounded-lg p-3">
+                                        <h4 className="font-semibold text-orange-800 mb-2 flex items-center gap-2">
+                                            ⚙️ Version 3 : MANUELLE
+                                        </h4>
+                                        <p className="text-sm text-gray-700 mb-2">
+                                            Remplacer manuellement les valeurs dans le code.
+                                        </p>
+                                        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                                            <li>Remplacer <code className="bg-orange-100 px-1 rounded">{'{{ORDER_ID}}'}</code> par l'ID réel</li>
+                                            <li>Remplacer <code className="bg-orange-100 px-1 rounded">{'{{AMOUNT}}'}</code> par le montant réel</li>
+                                        </ul>
+                                        <div className="mt-2 p-2 bg-orange-50 rounded text-xs text-orange-700">
+                                            ✅ <strong>Parfait pour :</strong> Les partenaires qui veulent un contrôle total
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
                                     <p className="text-sm text-yellow-800">
                                         ⚠️ <strong>Important :</strong> Le pixel utilise le cookie <code>aff_link_id</code> défini lors du clic sur le lien d'affiliation.
                                         Assurez-vous que l'utilisateur a cliqué sur un lien d'affiliation avant d'arriver sur la page de confirmation.
