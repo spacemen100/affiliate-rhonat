@@ -54,7 +54,18 @@
         "affiliate": "Affiliate Dashboard",
         "brand": "Brand",
         "integrations": "Integrations",
-        "sales": "Sales Tracking"
+        "sales": "Sales Tracking",
+        "influencers": "Influencers"
+    },
+    "influencers": {
+        "title": "Influencer Management",
+        "subtitle": "Manage your influencers and create manual accounts.",
+        "create": "Create Influencer",
+        "name": "Display Name",
+        "unnamed": "Unnamed",
+        "noData": "No influencers found.",
+        "nameLabel": "Influencer Name (e.g. @handle)",
+        "createSuccess": "Influencer created successfully"
     },
     "sidebar": {
         "platform": "Platform",
@@ -105,6 +116,11 @@
         "deleteLink": "Delete Link",
         "viewDetails": "View Details",
         "linkCopied": "Link copied!",
+        "generateTitle": "Generate Affiliate Link",
+        "generateSubtitle": "Choose the influencer who will receive the commission for this link.",
+        "selectInfluencer": "Influencer",
+        "forMyself": "For myself",
+        "generate": "Generate Link",
         "noLinks": "No affiliate links",
         "createFirstLink": "Create your first affiliate link",
         "linkDetails": "Link Details",
@@ -576,8 +592,7 @@
         "amount": "Amount",
         "commission": "Commission",
         "startDate": "Start date (yyyy-mm-dd)",
-        "endDate": "End date (yyyy-mm-dd)",
-        "close": "Close"
+        "endDate": "End date (yyyy-mm-dd)"
     },
     "clickbank": {
         "clickStats": "Click Statistics",

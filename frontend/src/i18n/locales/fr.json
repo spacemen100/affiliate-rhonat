@@ -54,7 +54,18 @@
         "affiliate": "Dashboard affilié",
         "brand": "Marque",
         "integrations": "Intégrations",
-        "sales": "Comptabilisation des ventes"
+        "sales": "Comptabilisation des ventes",
+        "influencers": "Influenceurs"
+    },
+    "influencers": {
+        "title": "Gestion des Influenceurs",
+        "subtitle": "Gérez vos influenceurs et créez des comptes manuels.",
+        "create": "Créer un influenceur",
+        "name": "Nom d'affichage",
+        "unnamed": "Sans nom",
+        "noData": "Aucun influenceur trouvé.",
+        "nameLabel": "Nom de l'influenceur (ex: @pseudo)",
+        "createSuccess": "Influenceur créé avec succès"
     },
     "sidebar": {
         "platform": "Plateforme",
@@ -105,6 +116,11 @@
         "deleteLink": "Supprimer le lien",
         "viewDetails": "Voir les détails",
         "linkCopied": "Lien copié !",
+        "generateTitle": "Générer un lien d'affiliation",
+        "generateSubtitle": "Choisissez l'influenceur qui recevra la commission pour ce lien.",
+        "selectInfluencer": "Influenceur",
+        "forMyself": "Pour moi-même (mon compte)",
+        "generate": "Générer le lien",
         "noLinks": "Aucun lien d'affiliation",
         "createFirstLink": "Créez votre premier lien d'affiliation",
         "linkDetails": "Détails du lien",
@@ -575,76 +591,7 @@
         "amount": "Montant",
         "commission": "Commission",
         "startDate": "Date de début (yyyy-mm-dd)",
-        "endDate": "Date de fin (yyyy-mm-dd)",
-        "close": "Fermer"
-    },
-    "clickbank": {
-        "clickStats": "Statistiques de clics",
-        "getSales": "Récupérer les ventes",
-        "errors": {
-            "apiKeyRequired": "Veuillez entrer votre Developer API Key",
-            "datesRequired": "Veuillez définir une date de début et de fin.",
-            "accountRequired": "Veuillez renseigner un account (vendor) pour la dimension vendor."
-        },
-        "success": {
-            "statsRetrieved": "Statistiques récupérées pour {{count}} Tracking ID(s)"
-        },
-        "clickStatsDesc": "Récupérez les détails des clics par Tracking ID",
-        "dimension": "Dimension",
-        "account": "Account (vendor) — requis pour la dimension vendor",
-        "accountPlaceholder": "ex: freenzy",
-        "metrics": "Metrics (select)",
-        "results": "Résultats ({{count}} Vendor(s))",
-        "period": "Période",
-        "totalClicks": "Total Clics",
-        "totalSales": "Total Ventes",
-        "conversionRate": "Taux de Conversion",
-        "vendor": "Vendor",
-        "clicks": "Clics",
-        "sales": "Ventes",
-        "convRate": "Taux Conv.",
-        "revenue": "Revenus",
-        "viewRawData": "Voir les données JSON brutes"
-    },
-    "jvzoo": {
-        "title": "JVZoo",
-        "partnerConnector": "Connecteur partenaires",
-        "portal": "Portail JVZoo",
-        "apiCredentials": "Identifiants API",
-        "apiCredentialsDesc": "API Key JVZoo (obtenue depuis l'onglet Applications), API Secret si requis, et l'UUID de l'influenceur comme affiliateId.",
-        "testing": "Test en cours...",
-        "testConnection": "Tester la connexion",
-        "apiKey": "API Key",
-        "jvzooKey": "Clé JVZoo",
-        "apiSecret": "API Secret (optionnel)",
-        "jvzooSecret": "Secret JVZoo",
-        "influencerUuid": "Influenceur / UUID",
-        "influencerUuidPlaceholder": "UUID de l'influenceur",
-        "connectionSuccess": "Connexion réussie",
-        "connectionFailed": "Connexion échouée",
-        "apiResponse": "Réponse JSON de l'API JVZoo",
-        "jvzooProducts": "Produits JVZoo",
-        "jvzooProductsDesc": "Récupérez les offres disponibles depuis l'API JVZoo.",
-        "noOffers": "Aucune offre disponible. Cliquez sur \"Rafraîchir\" pour charger les offres.",
-        "createAffiliateLink": "Créer un lien d'affiliation JVZoo",
-        "createAffiliateLinkDesc": "Associez le produit JVZoo sélectionné avec votre UUID d'influenceur et un Tracking ID.",
-        "generateLink": "Générer le lien",
-        "selectedProduct": "Produit sélectionné",
-        "selectProductAbove": "Choisissez un produit ci-dessus",
-        "trackingId": "Tracking ID (optionnel)",
-        "generatedLink": "Lien généré",
-        "errors": {
-            "apiKeyRequired": "La JVZoo API Key est requise.",
-            "enterApiKey": "Veuillez entrer votre API Key JVZoo",
-            "selectProduct": "Choisissez un produit JVZoo.",
-            "connectionFailed": "Connexion JVZoo échouée"
-        },
-        "success": {
-            "credentialsSaved": "Identifiants JVZoo sauvegardés localement. L'UUID/affiliateId identifie l'influenceur.",
-            "connectionSuccess": "Connexion JVZoo réussie !",
-            "offersRetrieved": "{{count}} offre(s) JVZoo récupérée(s).",
-            "linkCreated": "Lien JVZoo créé avec succès !"
-        }
+        "endDate": "Date de fin (yyyy-mm-dd)"
     },
     "helpPage": {
         "title": "Centre d'Aide",

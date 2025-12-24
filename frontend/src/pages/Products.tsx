@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getProducts, createProduct } from '../api/products';
 import { createAffiliateLink } from '../api/affiliate';
 import { createBrand, getBrands } from '../api/brands';
+import { getAffiliates } from '../api/affiliates';
 import Toast from '../components/Toast';
 import { useTranslation } from 'react-i18next';
 
@@ -19,8 +20,16 @@ export default function Products() {
   const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<any[]>([]);
+  const [affiliates, setAffiliates] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [creatingProduct, setCreatingProduct] = useState<boolean>(false);
+
+  // Modal state
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedAffiliateId, setSelectedAffiliateId] = useState<string>(''); // '' means 'Me'
+  const [generatingLink, setGeneratingLink] = useState(false);
+
   const [creatingLinkId, setCreatingLinkId] = useState<string | null>(null);
   const [creatingBrand, setCreatingBrand] = useState<boolean>(false);
   const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
@@ -41,6 +50,7 @@ export default function Products() {
   useEffect(() => {
     refreshProducts();
     refreshBrands();
+    loadAffiliates();
   }, []);
 
   function refreshProducts() {
@@ -58,6 +68,11 @@ export default function Products() {
         setForm((f) => ({ ...f, brand_id: data[0].id }));
       }
     });
+  }
+
+  async function loadAffiliates() {
+    const { data } = await getAffiliates();
+    setAffiliates(data || []);
   }
 
   async function handleCreateBrand() {
@@ -108,10 +123,25 @@ export default function Products() {
     refreshProducts();
   }
 
-  async function handleCreateLink(productId: string) {
-    setCreatingLinkId(productId);
-    const { error } = await createAffiliateLink(productId);
-    setCreatingLinkId(null);
+  // Open modal
+  function openLinkModal(productId: string) {
+    setSelectedProductId(productId);
+    setSelectedAffiliateId(''); // Reset to 'Me'
+    setShowLinkModal(true);
+  }
+
+  // Generate link ACTION
+  async function handleGenerateLink() {
+    if (!selectedProductId) return;
+
+    setGeneratingLink(true);
+    const targetId = selectedAffiliateId === '' ? undefined : selectedAffiliateId;
+
+    const { error } = await createAffiliateLink(selectedProductId, undefined, targetId);
+
+    setGeneratingLink(false);
+    setShowLinkModal(false);
+
     if (error) setToast({ message: error.message, type: 'error' });
     else setToast({ message: t('links.linkCopied'), type: 'success' });
   }
@@ -205,13 +235,33 @@ export default function Products() {
             disabled={brands.length === 0}
           />
         </div>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-          onClick={handleCreateProduct}
-          disabled={creatingProduct || brands.length === 0}
-        >
-          {creatingProduct ? t('common.loading') : t('products.createProduct')}
-        </button>
+
+        {/* Dynamic Commission Preview */}
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between">
+          <div>
+            <p className="text-sm text-blue-800 font-medium">Aperçu de la commission influenceur</p>
+            <p className="text-xs text-blue-600">Calculé sur la base du prix et du pourcentage</p>
+          </div>
+          <div className="text-right">
+            <span className="text-2xl font-bold text-blue-700">
+              {form.price && form.commission_percent
+                ? (Number(form.price) * Number(form.commission_percent) / 100).toFixed(2)
+                : '0.00'}€
+            </span>
+            <span className="text-sm text-blue-600 ml-1">par vente</span>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+            onClick={handleCreateProduct}
+            disabled={creatingProduct || brands.length === 0}
+          >
+            {creatingProduct ? t('common.loading') : t('products.createProduct')}
+          </button>
+        </div>
+
       </div>
 
       {loading && <div className="text-gray-600 mb-2">{t('common.loading')}</div>}
@@ -225,7 +275,9 @@ export default function Products() {
             <div>
               <h2 className="font-semibold text-lg mb-1">{p.name}</h2>
               <p className="text-gray-700 mb-1">{p.price}€</p>
-              <p className="text-sm text-gray-500">{t('products.commission')} : {p.commission_percent}%</p>
+              <p className="text-sm text-gray-500">
+                {t('products.commission')} : {p.commission_percent}% ({(p.price * p.commission_percent / 100).toFixed(2)}€)
+              </p>
             </div>
             <Link
               to={`/products/${p.id}`}
@@ -235,14 +287,57 @@ export default function Products() {
             </Link>
             <button
               className="bg-green-600 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
-              onClick={() => handleCreateLink(p.id)}
-              disabled={creatingLinkId === p.id}
+              onClick={() => openLinkModal(p.id)}
             >
-              {creatingLinkId === p.id ? t('common.loading') : t('links.createLink')}
+              {t('links.createLink')}
             </button>
           </div>
         ))}
       </div>
+
+      {/* MODAL GENERATION LIEN */}
+      {showLinkModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md space-y-4">
+            <h2 className="text-xl font-bold">{t('links.generateTitle')}</h2>
+            <p className="text-sm text-gray-600">{t('links.generateSubtitle')}</p>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('links.selectInfluencer')}
+              </label>
+              <select
+                className="w-full border p-2 rounded"
+                value={selectedAffiliateId}
+                onChange={(e) => setSelectedAffiliateId(e.target.value)}
+              >
+                <option value="">{t('links.forMyself')}</option>
+                {affiliates.map(aff => (
+                  <option key={aff.id} value={aff.id}>
+                    {aff.display_name || t('influencers.unnamed')}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                className="text-gray-600 hover:bg-gray-100 px-4 py-2 rounded"
+                onClick={() => setShowLinkModal(false)}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                onClick={handleGenerateLink}
+                disabled={generatingLink}
+              >
+                {generatingLink ? t('common.loading') : t('links.generate')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

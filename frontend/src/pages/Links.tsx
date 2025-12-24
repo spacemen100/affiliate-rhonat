@@ -5,6 +5,7 @@ import {
   createAffiliateLink,
   deleteAffiliateLink
 } from '../api/affiliate';
+import { getAffiliates } from '../api/affiliates';
 import { getProducts } from '../api/products';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../api/supabase';
@@ -19,7 +20,9 @@ export default function Links() {
   const { user } = useAuth();
   const [links, setLinks] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [affiliates, setAffiliates] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<string>('');
+  const [selectedAffiliate, setSelectedAffiliate] = useState<string>('');
   const [customCode, setCustomCode] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -32,6 +35,7 @@ export default function Links() {
       setProducts(data ?? []);
       if (data?.[0]?.id) setSelectedProduct(data[0].id);
     });
+    getAffiliates().then(({ data }) => setAffiliates(data ?? []));
   }, []);
 
   useEffect(() => {
@@ -56,7 +60,8 @@ export default function Links() {
     }
     setLoading(true);
     try {
-      const { error } = await createAffiliateLink(selectedProduct, customCode);
+      const targetId = selectedAffiliate === '' ? undefined : selectedAffiliate;
+      const { error } = await createAffiliateLink(selectedProduct, customCode, targetId);
       if (error) {
         alert(error.message);
         return;
@@ -101,6 +106,20 @@ export default function Links() {
           {products.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name} — {p.price}€
+            </option>
+          ))}
+        </select>
+
+        <label className="text-sm font-medium">{t('links.selectInfluencer')}</label>
+        <select
+          className="border p-2 rounded"
+          value={selectedAffiliate}
+          onChange={(e) => setSelectedAffiliate(e.target.value)}
+        >
+          <option value="">{t('links.forMyself')}</option>
+          {affiliates.map((aff) => (
+            <option key={aff.id} value={aff.id}>
+              {aff.display_name || t('influencers.unnamed')}
             </option>
           ))}
         </select>

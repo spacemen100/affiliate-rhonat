@@ -19,6 +19,7 @@ import TestSale from './pages/TestSale';
 import TestSalePixel from './pages/TestSalePixel';
 import AdminReports from './pages/AdminReports';
 import Conversions from './pages/Conversions';
+import Influencers from './pages/Influencers';
 import { useAuth } from './hooks/useAuth';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -188,6 +189,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <HelpCenter />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/influencers"
+          element={
+            <PrivateRoute>
+              <Influencers />
             </PrivateRoute>
           }
         />

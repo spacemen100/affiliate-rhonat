@@ -273,7 +273,12 @@ export default function ProductDetails() {
           </div>
           <div className="bg-white p-4 rounded shadow">
             <p className="text-sm text-gray-500">Commission</p>
-            <p className="text-xl font-semibold">{product.commission_percent}%</p>
+            <p className="text-xl font-semibold">
+              {product.commission_percent}%
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                ({(product.price * product.commission_percent / 100).toFixed(2)}€)
+              </span>
+            </p>
           </div>
           <div className="bg-white p-4 rounded shadow">
             <p className="text-sm text-gray-500">Gravité</p>

@@ -4,37 +4,43 @@ export async function getAffiliateLinks() {
   return supabase.from('affiliate_links').select('id, code, product_id, affiliate_id');
 }
 
-export async function createAffiliateLink(product_id: string, code?: string) {
+export async function createAffiliateLink(product_id: string, code?: string, targetAffiliateId?: string) {
   const user = await supabase.auth.getUser();
   const userId = user.data.user?.id;
 
-  if (!userId) {
-    return { data: null, error: { message: 'Utilisateur non authentifié.' } as any };
-  }
+  let affiliateIdToUse = targetAffiliateId;
 
-  // ensure we have the affiliate id for the current user
-  let { data: affiliate, error: affiliateErr } = await supabase
-    .from('affiliates')
-    .select('id')
-    .eq('user_id', userId)
-    .limit(1)
-    .maybeSingle();
+  // Si pas de targetAffiliateId, on utilise celui de l'utilisateur connecté
+  if (!affiliateIdToUse) {
+    if (!userId) {
+      return { data: null, error: { message: 'Utilisateur non authentifié.' } as any };
+    }
 
-  if (affiliateErr) return { data: null, error: affiliateErr };
-
-  // Si aucun affilié, on le crée à la volée (sécurité: RLS est désactivée côté DB)
-  if (!affiliate) {
-    const { data: created, error: createErr } = await supabase
+    // ensure we have the affiliate id for the current user
+    let { data: affiliate, error: affiliateErr } = await supabase
       .from('affiliates')
-      .insert({ user_id: userId, display_name: user.data.user?.email ?? 'Affilié' })
       .select('id')
+      .eq('user_id', userId)
       .limit(1)
       .maybeSingle();
-    if (createErr) return { data: null, error: createErr };
-    affiliate = created || null;
+
+    if (affiliateErr) return { data: null, error: affiliateErr };
+
+    // Si aucun affilié, on le crée à la volée (sécurité: RLS est désactivée côté DB)
     if (!affiliate) {
-      return { data: null, error: { message: 'Impossible de créer un affilié pour cet utilisateur.' } as any };
+      const { data: created, error: createErr } = await supabase
+        .from('affiliates')
+        .insert({ user_id: userId, display_name: user.data.user?.email ?? 'Affilié' })
+        .select('id')
+        .limit(1)
+        .maybeSingle();
+      if (createErr) return { data: null, error: createErr };
+      affiliate = created || null;
+      if (!affiliate) {
+        return { data: null, error: { message: 'Impossible de créer un affilié pour cet utilisateur.' } as any };
+      }
     }
+    affiliateIdToUse = affiliate.id;
   }
 
   const generatedCode = code && code.trim().length > 0
@@ -42,7 +48,7 @@ export async function createAffiliateLink(product_id: string, code?: string) {
     : `AFF-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
   return supabase.from('affiliate_links').insert({
-    affiliate_id: affiliate.id,
+    affiliate_id: affiliateIdToUse,
     product_id,
     code: generatedCode
   });
