@@ -164,7 +164,9 @@
     "clickbank": {
         "title": "ClickBank",
         "apiCredentials": "API Credentials",
-        "clickStats": "Click Statistics",
+        "clickStats": "Get Clicks",
+        "getSales": "Get Sales",
+        "salesCommissions": "Sales & Commissions",
         "createAffiliateLink": "Create Affiliate Link",
         "sales": "Sales",
         "orders": "Orders",
@@ -198,7 +200,8 @@
         "refreshData": "Refresh Data"
     },
     "conversions": {
-        "title": "Conversions",
+        "title": "Conversions & Sales",
+        "description": "Track your sales and generate conversion pixels for your thank you pages",
         "pixelTracking": "Pixel Tracking",
         "conversionPixel": "Conversion Pixel",
         "pixelCode": "Pixel Code",
@@ -214,6 +217,8 @@
         "inactive": "Inactive",
         "lastFired": "Last Fired",
         "totalConversions": "Total Conversions",
+        "totalRevenue": "Total Revenue",
+        "totalCommission": "Total Commission",
         "conversionValue": "Conversion Value",
         "conversionRate": "Conversion Rate",
         "recentConversions": "Recent Conversions",
@@ -221,12 +226,18 @@
         "amount": "Amount",
         "date": "Date",
         "linkId": "Link ID",
-        "noConversions": "No conversions"
+        "noConversions": "No conversions recorded yet",
+        "pixelGenerator": "Conversion Pixel Generator",
+        "selectLink": "Select an affiliate link",
+        "chooseLink": "-- Choose a link --",
+        "generatePixel": "Generate Pixel Code",
+        "history": "Conversion History"
     },
     "testSale": {
-        "title": "Test Sale",
+        "title": "Sales Tracking Test",
         "testConversion": "Test Conversion",
         "simulateSale": "Simulate Sale",
+        "testSale": "Test Sale Recording",
         "linkId": "Link ID",
         "enterLinkId": "Enter link ID",
         "orderAmount": "Order Amount",
@@ -429,6 +440,14 @@
         "settings": "Settings",
         "profile": "Profile",
         "account": "Account",
-        "logout": "Logout"
+        "logout": "Logout",
+        "show": "Show",
+        "hide": "Hide",
+        "new": "New",
+        "date": "Date",
+        "product": "Product",
+        "link": "Link",
+        "amount": "Amount",
+        "commission": "Commission"
     }
 }

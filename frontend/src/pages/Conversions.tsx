@@ -237,7 +237,7 @@ export default function Conversions() {
                         {t('conversions.title')}
                     </h1>
                     <p className="text-gray-600">
-                        Suivez vos ventes et générez des pixels de conversion pour vos pages de remerciement
+                        {t('conversions.description')}
                     </p>
                 </div>
 
@@ -248,7 +248,7 @@ export default function Conversions() {
                             <ShoppingCart className="w-8 h-8 opacity-80" />
                             <span className="text-2xl font-bold">{stats.totalConversions}</span>
                         </div>
-                        <p className="text-blue-100 text-sm">Total Conversions</p>
+                        <p className="text-blue-100 text-sm">{t('conversions.totalConversions')}</p>
                     </div>
 
                     <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
@@ -256,7 +256,7 @@ export default function Conversions() {
                             <DollarSign className="w-8 h-8 opacity-80" />
                             <span className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</span>
                         </div>
-                        <p className="text-green-100 text-sm">Revenu Total</p>
+                        <p className="text-green-100 text-sm">{t('conversions.totalRevenue')}</p>
                     </div>
 
                     <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
@@ -264,7 +264,7 @@ export default function Conversions() {
                             <TrendingUp className="w-8 h-8 opacity-80" />
                             <span className="text-2xl font-bold">${stats.totalCommission.toFixed(2)}</span>
                         </div>
-                        <p className="text-purple-100 text-sm">Commission Totale</p>
+                        <p className="text-purple-100 text-sm">{t('conversions.totalCommission')}</p>
                     </div>
 
                     <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
@@ -272,7 +272,7 @@ export default function Conversions() {
                             <TrendingUp className="w-8 h-8 opacity-80" />
                             <span className="text-2xl font-bold">{stats.conversionRate.toFixed(2)}%</span>
                         </div>
-                        <p className="text-orange-100 text-sm">Taux de Conversion</p>
+                        <p className="text-orange-100 text-sm">{t('conversions.conversionRate')}</p>
                     </div>
                 </div>
 
@@ -281,13 +281,13 @@ export default function Conversions() {
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <Code className="w-6 h-6 text-indigo-600" />
-                            <h2 className="text-xl font-bold text-gray-900">Générateur de Pixel de Conversion</h2>
+                            <h2 className="text-xl font-bold text-gray-900">{t('conversions.pixelGenerator')}</h2>
                         </div>
                         <button
                             onClick={() => setShowPixelGenerator(!showPixelGenerator)}
                             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                         >
-                            {showPixelGenerator ? 'Masquer' : 'Afficher'}
+                            {showPixelGenerator ? t('common.hide') : t('common.show')}
                         </button>
                     </div>
 
@@ -295,14 +295,14 @@ export default function Conversions() {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Sélectionner un lien d'affiliation
+                                    {t('conversions.selectLink')}
                                 </label>
                                 <select
                                     value={selectedLink}
                                     onChange={(e) => setSelectedLink(e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 >
-                                    <option value="">-- Choisir un lien --</option>
+                                    <option value="">{t('conversions.chooseLink')}</option>
                                     {affiliateLinks.map((link) => (
                                         <option key={link.id} value={link.id}>
                                             {link.code} - {link.products?.name}
@@ -316,7 +316,7 @@ export default function Conversions() {
                                 disabled={!selectedLink}
                                 className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                             >
-                                Générer le Code Pixel
+                                {t('conversions.generatePixel')}
                             </button>
 
                             {pixelCode && (
@@ -331,12 +331,12 @@ export default function Conversions() {
                                         {copied ? (
                                             <>
                                                 <Check className="w-4 h-4" />
-                                                Copié !
+                                                {t('common.copied')}
                                             </>
                                         ) : (
                                             <>
                                                 <Copy className="w-4 h-4" />
-                                                Copier
+                                                {t('common.copy')}
                                             </>
                                         )}
                                     </button>
@@ -415,14 +415,14 @@ export default function Conversions() {
                 {/* Liste des conversions */}
                 <div className="bg-white rounded-xl shadow-md overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200">
-                        <h2 className="text-xl font-bold text-gray-900">Historique des Conversions</h2>
+                        <h2 className="text-xl font-bold text-gray-900">{t('conversions.history')}</h2>
                     </div>
 
                     {loading ? (
                         <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>
                     ) : conversions.length === 0 ? (
                         <div className="p-8 text-center text-gray-500">
-                            Aucune conversion enregistrée pour le moment
+                            {t('conversions.noConversions')}
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
@@ -430,22 +430,22 @@ export default function Conversions() {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date
+                                            {t('common.date')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Produit
+                                            {t('common.product')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Lien
+                                            {t('common.link')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            ID Commande
+                                            {t('conversions.orderId')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Montant
+                                            {t('common.amount')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Commission
+                                            {t('common.commission')}
                                         </th>
                                     </tr>
                                 </thead>
