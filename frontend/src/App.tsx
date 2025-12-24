@@ -19,12 +19,26 @@ import TestSalePixel from './pages/TestSalePixel';
 import AdminReports from './pages/AdminReports';
 import Conversions from './pages/Conversions';
 import { useAuth } from './hooks/useAuth';
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+
+function Layout({ children }: { children: JSX.Element }) {
+  return (
+    <div className="app-background flex gap-6">
+      <Sidebar />
+      <div className="w-full space-y-4">
+        <Navbar />
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="p-6">Chargement...</div>;
   if (!user) return <Navigate to="/" replace />;
-  return children;
+  return <Layout>{children}</Layout>;
 }
 
 export default function App() {

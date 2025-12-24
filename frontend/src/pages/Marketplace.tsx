@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getMarketplaceProducts } from '../api/marketplace';
 import ProductCard from '../components/marketplace/ProductCard';
-import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
 import { useTranslation } from 'react-i18next';
 
 export default function Marketplace() {
@@ -18,32 +16,26 @@ export default function Marketplace() {
   }, []);
 
   return (
-    <div className="app-background flex gap-6">
-      <Sidebar />
-      <div className="w-full space-y-4">
-        <Navbar />
-        <main className="page-surface p-6 w-full">
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div>
-              <p className="text-sm text-gray-500 font-medium">{t('marketplace.browseProducts')}</p>
-              <h1 className="text-2xl font-bold">{t('marketplace.title')}</h1>
-            </div>
-            <button type="button" className="btn-ghost text-sm">{t('tables.filter')}</button>
-          </div>
-
-          {loading && <div className="text-gray-600 mb-2">{t('common.loading')}</div>}
-          {!loading && products.length === 0 && (
-            <div className="card p-4 text-gray-600">
-              {t('products.noProducts')}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((p) => <ProductCard key={p.product_id} product={p} />)}
-          </div>
-        </main>
+    <main className="page-surface p-6 w-full">
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <p className="text-sm text-gray-500 font-medium">{t('marketplace.browseProducts')}</p>
+          <h1 className="text-2xl font-bold">{t('marketplace.title')}</h1>
+        </div>
+        <button type="button" className="btn-ghost text-sm">{t('tables.filter')}</button>
       </div>
-    </div>
+
+      {loading && <div className="text-gray-600 mb-2">{t('common.loading')}</div>}
+      {!loading && products.length === 0 && (
+        <div className="card p-4 text-gray-600">
+          {t('products.noProducts')}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {products.map((p) => <ProductCard key={p.product_id} product={p} />)}
+      </div>
+    </main>
   );
 }
 
