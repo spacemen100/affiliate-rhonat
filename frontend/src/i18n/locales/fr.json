@@ -645,5 +645,45 @@
             "offersRetrieved": "{{count}} offre(s) JVZoo récupérée(s).",
             "linkCreated": "Lien JVZoo créé avec succès !"
         }
+    },
+    "helpPage": {
+        "title": "Centre d'Aide",
+        "subtitle": "Tout ce que vous devez savoir pour utiliser l'application",
+        "sections": {
+            "dashboard": {
+                "title": "Tableau de Bord",
+                "content": "Le tableau de bord est votre centre de commandement. Il affiche un récapitulatif de vos performances : nombre de clics, ventes générées, et commissions gagnées. Les graphiques vous permettent de visualiser l'évolution de votre activité sur les 7 ou 30 derniers jours."
+            },
+            "links": {
+                "title": "Gestion des Liens",
+                "content": "Cette section vous permet de créer des liens d'affiliation uniques pour les produits. Vous pouvez suivre le nombre de clics et de ventes pour chaque lien spécifique, ce qui est idéal pour tester différentes sources de trafic (Facebook, Email, Blog)."
+            },
+            "conversions": {
+                "title": "Suivi des Ventes (Pixel)",
+                "content": "Pour suivre les ventes, vous devez installer notre pixel de conversion sur votre page de confirmation de commande (Thank You Page). Le pixel détecte automatiquement les ventes et les attribue au bon affilié via un cookie."
+            },
+            "integrations": {
+                "title": "Autre réseaux (ClickBank/JVZoo)",
+                "content": "Connectez vos comptes ClickBank et JVZoo pour importer automatiquement vos données de vente et générer des liens d'affiliation directement depuis cette interface. Cela centralise toutes vos statistiques au même endroit."
+            },
+            "reports": {
+                "title": "Rapports Avancés",
+                "content": "Les rapports admin vous donnent une vue détaillée par marque, produit et affilié. Utilisez ces rapports pour identifier vos meilleurs partenaires et vos produits les plus performants."
+            }
+        },
+        "faq": {
+            "title": "Questions Fréquentes",
+            "q1": "Comment tester si le pixel fonctionne ?",
+            "a1": "Utilisez la page 'Test Pixel Vente'. Cliquez d'abord sur un lien d'affiliation pour créer un cookie, puis utilisez le bouton de simulation pour vérifier que le pixel enregistre bien la vente.",
+            "q2": "Combien de temps dure le cookie ?",
+            "a2": "Le cookie d'affiliation est valide pendant 30 jours par défaut. Si l'utilisateur achète dans ce délai, la commission vous sera attribuée.",
+            "q3": "Puis-je utiliser mes propres pages de vente ?",
+            "a3": "Oui, absolument. Il suffit de rediriger vos liens d'affiliation vers vos propres pages et de vous assurer que le pixel est bien présent sur la page finale après l'achat."
+        },
+        "contact": {
+            "title": "Besoin d'aide supplémentaire ?",
+            "text": "Notre équipe de support est là pour vous aider.",
+            "button": "Contacter le support"
+        }
     }
 }

@@ -646,5 +646,45 @@
             "offersRetrieved": "{{count}} JVZoo offer(s) retrieved.",
             "linkCreated": "JVZoo link created successfully!"
         }
+    },
+    "helpPage": {
+        "title": "Help Center",
+        "subtitle": "Everything you need to know to use the application",
+        "sections": {
+            "dashboard": {
+                "title": "Dashboard",
+                "content": "The dashboard is your command center. It displays a summary of your performance: total clicks, sales generated, and commissions earned. Charts allow you to visualize your activity trends over the last 7 or 30 days."
+            },
+            "links": {
+                "title": "Link Management",
+                "content": "This section allows you to create unique affiliate links for products. You can track clicks and sales for each specific link, which is ideal for testing different traffic sources (Facebook, Email, Blog)."
+            },
+            "conversions": {
+                "title": "Sales Tracking (Pixel)",
+                "content": "To track sales, you must install our conversion pixel on your order confirmation page (Thank You Page). The pixel automatically detects sales and attributes them to the correct affiliate via a cookie."
+            },
+            "integrations": {
+                "title": "Other Networks (ClickBank/JVZoo)",
+                "content": "Connect your ClickBank and JVZoo accounts to automatically import your sales data and generate affiliate links directly from this interface. This centralizes all your statistics in one place."
+            },
+            "reports": {
+                "title": "Advanced Reports",
+                "content": "Admin reports give you a detailed view by brand, product, and affiliate. Use these reports to identify your best partners and top-performing products."
+            }
+        },
+        "faq": {
+            "title": "Frequently Asked Questions",
+            "q1": "How to test if the pixel works?",
+            "a1": "Use the 'Test Sale Pixel' page. First click on an affiliate link to create a cookie, then use the simulation button to verify that the pixel records the sale correctly.",
+            "q2": "How long does the cookie last?",
+            "a2": "The affiliate cookie is valid for 30 days by default. If the user purchases within this timeframe, the commission will be attributed to you.",
+            "q3": "Can I use my own sales pages?",
+            "a3": "Yes, absolutely. Just redirect your affiliate links to your own pages and ensure the pixel is present on the final page after purchase."
+        },
+        "contact": {
+            "title": "Need more help?",
+            "text": "Our support team is here to assist you.",
+            "button": "Contact Support"
+        }
     }
 }
