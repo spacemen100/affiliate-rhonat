@@ -6,7 +6,6 @@ import {
   deleteAffiliateLink
 } from '../api/affiliate';
 import { getProducts } from '../api/products';
-import Sidebar from '../components/Sidebar';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../api/supabase';
 import { useTranslation } from 'react-i18next';
@@ -88,101 +87,98 @@ export default function Links() {
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="p-6 w-full flex flex-col gap-6">
-        <h1 className="text-2xl font-bold">{t('links.title')}</h1>
+    <div className="p-6 w-full flex flex-col gap-6">
+      <h1 className="text-2xl font-bold">{t('links.title')}</h1>
 
-        <div className="bg-white shadow rounded p-4 flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">{t('links.createLink')}</h2>
-          <label className="text-sm font-medium">{t('links.product')}</label>
-          <select
-            className="border p-2 rounded"
-            value={selectedProduct}
-            onChange={(e) => setSelectedProduct(e.target.value)}
-          >
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} — {p.price}€
-              </option>
-            ))}
-          </select>
+      <div className="bg-white shadow rounded p-4 flex flex-col gap-3">
+        <h2 className="text-lg font-semibold">{t('links.createLink')}</h2>
+        <label className="text-sm font-medium">{t('links.product')}</label>
+        <select
+          className="border p-2 rounded"
+          value={selectedProduct}
+          onChange={(e) => setSelectedProduct(e.target.value)}
+        >
+          {products.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name} — {p.price}€
+            </option>
+          ))}
+        </select>
 
-          <label className="text-sm font-medium">{t('forms.optional')}</label>
-          <input
-            className="border p-2 rounded"
-            placeholder="Ex: INSTA-ABC123"
-            value={customCode}
-            onChange={(e) => setCustomCode(e.target.value)}
-          />
+        <label className="text-sm font-medium">{t('forms.optional')}</label>
+        <input
+          className="border p-2 rounded"
+          placeholder={t('links.codePlaceholder')}
+          value={customCode}
+          onChange={(e) => setCustomCode(e.target.value)}
+        />
 
-          <button
-            className="bg-blue-600 text-white p-2 rounded disabled:opacity-60"
-            onClick={handleCreate}
-            disabled={loading}
-          >
-            {loading ? t('common.loading') : t('links.createLink')}
-          </button>
+        <button
+          className="bg-blue-600 text-white p-2 rounded disabled:opacity-60"
+          onClick={handleCreate}
+          disabled={loading}
+        >
+          {loading ? t('common.loading') : t('links.createLink')}
+        </button>
 
-          <p className="text-sm text-gray-600">
-            {t('links.createFirstLink')}
-          </p>
-        </div>
+        <p className="text-sm text-gray-600">
+          {t('links.createFirstLink')}
+        </p>
+      </div>
 
-        <div className="flex flex-col gap-2">
-          {links.length === 0 && (
-            <div className="p-4 bg-white rounded shadow text-gray-600">
-              {t('links.noLinks')}
-            </div>
-          )}
-          {links.map((l) => {
-            const product = productMap[l.product_id];
-            return (
-              <div key={l.id} className="p-3 bg-white rounded shadow flex flex-col gap-1">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex flex-col gap-1">
-                    <RouterLink
-                      to={`/links/${l.id}`}
-                      className="font-semibold text-blue-700 hover:underline"
-                    >
-                      {product?.name ?? 'Produit'}
-                    </RouterLink>
-                    <a
-                      className="text-sm text-blue-600 hover:underline break-all"
-                      href={`${BASE_GO_URL}/${l.code}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('links.linkUrl')} : {BASE_GO_URL}/{l.code}
-                    </a>
-                    <div className="text-xs text-gray-500">
-                      Code : {l.code} — Produit #{l.product_id}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    {l.affiliate_id === myAffiliateId && (
-                      <span
-                        title="Mon lien"
-                        className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full border border-green-200"
-                      >
-                        <StarIcon /> Moi
-                      </span>
-                    )}
-                    <button
-                      className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                      title="Supprimer le lien"
-                      onClick={() => setLinkToDelete(l)}
-                      disabled={deletingId === l.id}
-                      aria-label="Supprimer le lien"
-                    >
-                      <TrashIcon />
-                    </button>
+      <div className="flex flex-col gap-2">
+        {links.length === 0 && (
+          <div className="p-4 bg-white rounded shadow text-gray-600">
+            {t('links.noLinks')}
+          </div>
+        )}
+        {links.map((l) => {
+          const product = productMap[l.product_id];
+          return (
+            <div key={l.id} className="p-3 bg-white rounded shadow flex flex-col gap-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-1">
+                  <RouterLink
+                    to={`/links/${l.id}`}
+                    className="font-semibold text-blue-700 hover:underline"
+                  >
+                    {product?.name ?? t('common.product')}
+                  </RouterLink>
+                  <a
+                    className="text-sm text-blue-600 hover:underline break-all"
+                    href={`${BASE_GO_URL}/${l.code}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('links.linkUrl')} : {BASE_GO_URL}/{l.code}
+                  </a>
+                  <div className="text-xs text-gray-500">
+                    Code : {l.code} — Produit #{l.product_id}
                   </div>
                 </div>
+                <div className="flex items-start gap-3">
+                  {l.affiliate_id === myAffiliateId && (
+                    <span
+                      title={t('links.myLink')}
+                      className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full border border-green-200"
+                    >
+                      <StarIcon /> {t('links.me')}
+                    </span>
+                  )}
+                  <button
+                    className="text-red-600 hover:text-red-800 disabled:opacity-50"
+                    title={t('links.deleteLink')}
+                    onClick={() => setLinkToDelete(l)}
+                    disabled={deletingId === l.id}
+                    aria-label={t('links.deleteLink')}
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
       {linkToDelete && (
         <ConfirmDeleteModal
@@ -256,7 +252,7 @@ function ConfirmDeleteModal({
 
           <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
             <p className="text-sm text-gray-800 font-semibold truncate">
-              {product?.name ?? 'Produit'}
+              {product?.name ?? t('common.product')}
             </p>
             <p className="text-xs text-gray-600 mt-1 break-all font-mono">
               {BASE_GO_URL}/{link.code}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { getAffiliateLinks } from '../api/affiliate';
-import Sidebar from '../components/Sidebar';
 import { useTranslation } from 'react-i18next';
 
 export default function TestSale() {
@@ -44,23 +43,23 @@ export default function TestSale() {
     document.cookie = `${COOKIE_NAME}=${COOKIE_VALUE}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`;
 
     checkCookie();
-    setResult({ success: true, message: `Cookie créé avec le link_id: ${selectedLink.id}` });
+    setResult({ success: true, message: t('testSale.successMessages.cookieCreated', { linkId: selectedLink.id }) });
   };
 
   const testSale = async () => {
     if (!selectedLink) {
-      setResult({ success: false, message: 'Veuillez sélectionner un lien d\'affiliation' });
+      setResult({ success: false, message: t('testSale.errors.selectLink') });
       return;
     }
 
     if (!orderId || !amount) {
-      setResult({ success: false, message: 'Veuillez remplir l\'ID de commande et le montant' });
+      setResult({ success: false, message: t('testSale.errors.fillOrderIdAmount') });
       return;
     }
 
     const amountNum = parseFloat(amount);
     if (isNaN(amountNum) || amountNum <= 0) {
-      setResult({ success: false, message: 'Le montant doit être un nombre positif' });
+      setResult({ success: false, message: t('testSale.errors.amountMustBePositive') });
       return;
     }
 
@@ -75,7 +74,7 @@ export default function TestSale() {
       if (!supabaseUrl || !supabaseAnonKey) {
         setResult({
           success: false,
-          message: 'Variables d\'environnement manquantes. Vérifiez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.'
+          message: t('testSale.errors.missingEnvVars')
         });
         setLoading(false);
         return;
@@ -101,7 +100,7 @@ export default function TestSale() {
           const data = await response.json();
           setResult({
             success: true,
-            message: `Vente enregistrée avec succès via Edge Function ! Order ID: ${orderId}, Montant: ${amountNum}€`
+            message: t('testSale.successMessages.saleRecordedEdge', { orderId, amount: amountNum })
           });
           setOrderId('');
           setAmount('99.90');
@@ -138,7 +137,7 @@ export default function TestSale() {
 
           setResult({
             success: true,
-            message: `Vente enregistrée avec succès via fonction RPC ! Order ID: ${orderId}, Montant: ${amountNum}€, Commission: ${data.commission?.toFixed(2)}€`
+            message: t('testSale.successMessages.saleRecordedRpc', { orderId, amount: amountNum, commission: data.commission?.toFixed(2) })
           });
           setOrderId('');
           setAmount('99.90');
@@ -199,7 +198,7 @@ export default function TestSale() {
 
             setResult({
               success: true,
-              message: `Vente enregistrée avec succès via API REST ! Order ID: ${orderId}, Montant: ${amountNum}€, Commission: ${commission.toFixed(2)}€`
+              message: t('testSale.successMessages.saleRecordedRest', { orderId, amount: amountNum, commission: commission.toFixed(2) })
             });
             setOrderId('');
             setAmount('99.90');
@@ -215,9 +214,9 @@ export default function TestSale() {
 
       // Messages d'erreur plus explicites
       if (error.message?.includes('permission denied') || error.message?.includes('new row violates row-level security')) {
-        errorMessage = 'Permission refusée. Vérifiez que la migration 11_allow_sales_insert.sql a été exécutée pour permettre l\'insertion de ventes.';
+        errorMessage = t('testSale.errors.permissionDenied');
       } else if (error.message?.includes('Failed to fetch') || error.message?.includes('ERR_BLOCKED_BY_CLIENT')) {
-        errorMessage = 'Connexion bloquée. Vérifiez que l\'Edge Function record-sale est déployée sur Supabase, ou que les politiques RLS permettent l\'insertion.';
+        errorMessage = t('testSale.errors.connectionBlocked');
       }
 
       setResult({
@@ -232,138 +231,134 @@ export default function TestSale() {
   const clearCookie = () => {
     document.cookie = 'aff_link_id=; Path=/; Max-Age=0';
     checkCookie();
-    setResult({ success: true, message: 'Cookie supprimé' });
+    setResult({ success: true, message: t('testSale.successMessages.cookieDeleted') });
   };
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="p-6 w-full max-w-4xl">
-        <h1 className="text-2xl font-bold mb-6">{t('testSale.title')}</h1>
+    <main className="p-6 w-full max-w-4xl">
+      <h1 className="text-2xl font-bold mb-6">{t('testSale.title')}</h1>
 
-        <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6 text-sm text-blue-800">
-          <strong>💡 Comment tester :</strong>
-          <ol className="list-decimal list-inside mt-2 space-y-1">
-            <li>Sélectionnez un lien d'affiliation ci-dessous</li>
-            <li>Cliquez sur "Simuler un clic" pour créer le cookie d'affiliation</li>
-            <li>Remplissez les informations de la vente (Order ID et Montant)</li>
-            <li>Cliquez sur "Tester l'enregistrement de la vente"</li>
-            <li>Vérifiez dans votre dashboard que la vente apparaît bien</li>
-          </ol>
-        </div>
+      <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6 text-sm text-blue-800">
+        <strong>💡 {t('testSale.howToTest')} :</strong>
+        <ol className="list-decimal list-inside mt-2 space-y-1">
+          <li>{t('testSale.selectLink')}</li>
+          <li>{t('testSale.simulateClick')}</li>
+          <li>{t('testSale.fillSaleInfo')}</li>
+          <li>{t('testSale.clickTestSale')}</li>
+          <li>{t('testSale.checkDashboard')}</li>
+        </ol>
+      </div>
 
-        <div className="bg-white p-6 shadow rounded mb-6">
-          <h2 className="text-lg font-semibold mb-4">1. Sélectionner un lien d'affiliation</h2>
-          <select
-            className="w-full p-2 border rounded"
-            value={selectedLink?.id || ''}
-            onChange={(e) => {
-              const link = links.find(l => l.id === e.target.value);
-              setSelectedLink(link || null);
-            }}
+      <div className="bg-white p-6 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">1. {t('testSale.selectAffiliateLink')}</h2>
+        <select
+          className="w-full p-2 border rounded"
+          value={selectedLink?.id || ''}
+          onChange={(e) => {
+            const link = links.find(l => l.id === e.target.value);
+            setSelectedLink(link || null);
+          }}
+        >
+          {links.length === 0 && <option value="">{t('testSale.noLinksAvailable')}</option>}
+          {links.map((link) => (
+            <option key={link.id} value={link.id}>
+              {link.code} (ID: {link.id.substring(0, 8)}...)
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="bg-white p-6 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">2. {t('testSale.simulateClickTitle')}</h2>
+        <div className="space-y-3">
+          <button
+            onClick={simulateClick}
+            disabled={!selectedLink}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {links.length === 0 && <option value="">Aucun lien disponible</option>}
-            {links.map((link) => (
-              <option key={link.id} value={link.id}>
-                {link.code} (ID: {link.id.substring(0, 8)}...)
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="bg-white p-6 shadow rounded mb-6">
-          <h2 className="text-lg font-semibold mb-4">2. Simuler un clic (créer le cookie)</h2>
-          <div className="space-y-3">
-            <button
-              onClick={simulateClick}
-              disabled={!selectedLink}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Simuler un clic
-            </button>
-            <div className="text-sm text-gray-600">
-              <p><strong>Cookie actuel :</strong> {cookieValue || 'Aucun cookie trouvé'}</p>
-              {cookieValue && (
-                <button
-                  onClick={clearCookie}
-                  className="mt-2 text-red-600 hover:text-red-800 text-xs underline"
-                >
-                  Supprimer le cookie
-                </button>
-              )}
-            </div>
+            {t('testSale.simulateClickButton')}
+          </button>
+          <div className="text-sm text-gray-600">
+            <p><strong>{t('testSale.currentCookie')} :</strong> {cookieValue || t('testSale.noCookieFound')}</p>
+            {cookieValue && (
+              <button
+                onClick={clearCookie}
+                className="mt-2 text-red-600 hover:text-red-800 text-xs underline"
+              >
+                {t('testSale.deleteCookie')}
+              </button>
+            )}
           </div>
         </div>
+      </div>
 
-        <div className="bg-white p-6 shadow rounded mb-6">
-          <h2 className="text-lg font-semibold mb-4">3. Tester l'enregistrement d'une vente</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Order ID (ID de commande)
-              </label>
-              <input
-                type="text"
-                value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
-                placeholder="ORDER_123"
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Montant (€)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="99.90"
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <button
-              onClick={testSale}
-              disabled={loading || !selectedLink || !orderId || !amount}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? t('common.loading') : t('testSale.testSale')}
-            </button>
+      <div className="bg-white p-6 shadow rounded mb-6">
+        <h2 className="text-lg font-semibold mb-4">3. {t('testSale.testSaleRecording')}</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('testSale.orderIdLabel')}
+            </label>
+            <input
+              type="text"
+              value={orderId}
+              onChange={(e) => setOrderId(e.target.value)}
+              placeholder="ORDER_123"
+              className="w-full p-2 border rounded"
+            />
           </div>
-        </div>
-
-        {result && (
-          <div className={`p-4 rounded border ${result.success
-              ? 'bg-green-50 border-green-200 text-green-800'
-              : 'bg-red-50 border-red-200 text-red-800'
-            }`}>
-            <strong>{result.success ? '✓ Succès' : '✗ Erreur'}</strong>
-            <p className="mt-1">{result.message}</p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('testSale.amountLabel')}
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="99.90"
+              className="w-full p-2 border rounded"
+            />
           </div>
-        )}
-
-        <div className="bg-gray-50 p-4 rounded mt-6 text-sm text-gray-600">
-          <h3 className="font-semibold mb-2">Informations techniques :</h3>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Le système essaie d'abord l'Edge Function : <code className="bg-gray-200 px-1 rounded">/functions/v1/record-sale</code></li>
-            <li>Si l'Edge Function n'est pas disponible, il utilise l'API REST Supabase directement</li>
-            <li>Le cookie <code className="bg-gray-200 px-1 rounded">aff_link_id</code> est valide pendant 30 jours</li>
-            <li>La commission est calculée automatiquement selon le pourcentage du produit</li>
-            <li>Vous pouvez vérifier les ventes dans le dashboard affilié</li>
-          </ul>
+          <button
+            onClick={testSale}
+            disabled={loading || !selectedLink || !orderId || !amount}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? t('common.loading') : t('testSale.testSale')}
+          </button>
         </div>
+      </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mt-4 text-sm text-yellow-800">
-          <strong>⚠️ Si vous obtenez une erreur "Failed to fetch" :</strong>
-          <ol className="list-decimal list-inside mt-2 space-y-1">
-            <li><strong>Option 1 (Recommandé)</strong> : Déployez l'Edge Function <code className="bg-yellow-100 px-1 rounded">record-sale</code> sur Supabase</li>
-            <li><strong>Option 2</strong> : Exécutez la migration <code className="bg-yellow-100 px-1 rounded">11_allow_sales_insert.sql</code> pour permettre l'insertion via l'API REST</li>
-            <li>Vérifiez que <code className="bg-yellow-100 px-1 rounded">VITE_SUPABASE_URL</code> et <code className="bg-yellow-100 px-1 rounded">VITE_SUPABASE_ANON_KEY</code> sont bien définies</li>
-          </ol>
+      {result && (
+        <div className={`p-4 rounded border ${result.success
+          ? 'bg-green-50 border-green-200 text-green-800'
+          : 'bg-red-50 border-red-200 text-red-800'
+          }`}>
+          <strong>{result.success ? `✓ ${t('testSale.success')}` : `✗ ${t('common.error')}`}</strong>
+          <p className="mt-1">{result.message}</p>
         </div>
-      </main>
-    </div>
+      )}
+
+      <div className="bg-gray-50 p-4 rounded mt-6 text-sm text-gray-600">
+        <h3 className="font-semibold mb-2">{t('testSale.technicalInfo')} :</h3>
+        <ul className="list-disc list-inside space-y-1">
+          <li>{t('testSale.edgeFunctionFirst')} : <code className="bg-gray-200 px-1 rounded">/functions/v1/record-sale</code></li>
+          <li>{t('testSale.fallbackToRest')}</li>
+          <li>{t('testSale.cookieValid30Days')}</li>
+          <li>{t('testSale.commissionAutoCalculated')}</li>
+          <li>{t('testSale.checkSalesInDashboard')}</li>
+        </ul>
+      </div>
+
+      <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mt-4 text-sm text-yellow-800">
+        <strong>⚠️ {t('testSale.failedToFetchError')} :</strong>
+        <ol className="list-decimal list-inside mt-2 space-y-1">
+          <li><strong>Option 1 (Recommandé)</strong> : {t('testSale.option1Deploy')}</li>
+          <li><strong>Option 2</strong> : {t('testSale.option2Migration')}</li>
+          <li>{t('testSale.checkEnvVars')}</li>
+        </ol>
+      </div>
+    </main>
   );
 }
-

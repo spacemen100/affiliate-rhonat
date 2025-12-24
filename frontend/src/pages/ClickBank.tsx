@@ -202,17 +202,17 @@ export default function Clickbank() {
 
   async function handleGetClicks() {
     if (!developerKey) {
-      setToast({ message: 'Veuillez entrer votre Developer API Key', type: 'error' });
+      setToast({ message: t('clickbank.errors.apiKeyRequired'), type: 'error' });
       return;
     }
     if (!analyticsFilters.startDate || !analyticsFilters.endDate) {
-      setToast({ message: 'Veuillez définir une date de début et de fin.', type: 'error' });
+      setToast({ message: t('clickbank.errors.datesRequired'), type: 'error' });
       return;
     }
     const dimension = analyticsFilters.dimension || 'TRACKING_ID';
     const account = analyticsFilters.account?.trim();
     if (dimension.toLowerCase() === 'vendor' && !account) {
-      setToast({ message: 'Veuillez renseigner un account (vendor) pour la dimension vendor.', type: 'error' });
+      setToast({ message: t('clickbank.errors.accountRequired'), type: 'error' });
       return;
     }
     const metrics = analyticsFilters.select?.trim() || 'HOP_COUNT,SALE_COUNT';
@@ -236,12 +236,12 @@ export default function Clickbank() {
 
       setClicksData(response);
       setToast({
-        message: `Statistiques récupérées pour ${response.data.length} Tracking ID(s)`,
+        message: t('clickbank.success.statsRetrieved', { count: response.data.length }),
         type: 'success',
       });
     } catch (error: any) {
       setToast({
-        message: `Erreur: ${error.message}`,
+        message: t('common.error') + `: ${error.message}`,
         type: 'error',
       });
     } finally {
@@ -261,7 +261,7 @@ export default function Clickbank() {
           <div className="flex items-center justify-between">
             <span className="text-sm">{toast.message}</span>
             <button onClick={() => setToast(null)} className="text-sm font-medium hover:underline">
-              Fermer
+              {t('common.close')}
             </button>
           </div>
         </div>
@@ -272,8 +272,8 @@ export default function Clickbank() {
       <section className="card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Statistiques de clics</h2>
-            <p className="text-sm text-gray-600">Récupérez les détails des clics par Tracking ID</p>
+            <h2 className="text-lg font-semibold">{t('clickbank.clickStats')}</h2>
+            <p className="text-sm text-gray-600">{t('clickbank.clickStatsDesc')}</p>
           </div>
           <button
             onClick={handleGetClicks}
@@ -285,7 +285,7 @@ export default function Clickbank() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">Date de début (yyyy-mm-dd)</span>
+            <span className="text-sm font-medium text-gray-700">{t('common.startDate')}</span>
             <input
               type="date"
               className="input"
@@ -294,7 +294,7 @@ export default function Clickbank() {
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">Date de fin (yyyy-mm-dd)</span>
+            <span className="text-sm font-medium text-gray-700">{t('common.endDate')}</span>
             <input
               type="date"
               className="input"
@@ -303,7 +303,7 @@ export default function Clickbank() {
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">Dimension</span>
+            <span className="text-sm font-medium text-gray-700">{t('clickbank.dimension')}</span>
             <select
               className="input"
               value={analyticsFilters.dimension}
@@ -315,17 +315,17 @@ export default function Clickbank() {
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm font-medium text-gray-700">
-              Account (vendor) — requis pour la dimension vendor
+              {t('clickbank.account')}
             </span>
             <input
               className="input"
-              placeholder="ex: freenzy"
+              placeholder={t('clickbank.accountPlaceholder')}
               value={analyticsFilters.account}
               onChange={(e) => setAnalyticsFilters({ ...analyticsFilters, account: e.target.value })}
             />
           </label>
           <label className="flex flex-col gap-1 md:col-span-2">
-            <span className="text-sm font-medium text-gray-700">Metrics (select)</span>
+            <span className="text-sm font-medium text-gray-700">{t('clickbank.metrics')}</span>
             <input
               className="input"
               placeholder="HOP_COUNT,SALE_COUNT"
@@ -337,28 +337,28 @@ export default function Clickbank() {
         {clicksData && (
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Résultats ({clicksData.data.length} Vendor(s))</h3>
+              <h3 className="text-sm font-semibold">{t('clickbank.results', { count: clicksData.data.length })}</h3>
               <div className="text-xs text-gray-500">
-                Période: {clicksData.period.startDate} → {clicksData.period.endDate}
+                {t('clickbank.period')} : {clicksData.period.startDate} → {clicksData.period.endDate}
               </div>
             </div>
 
             {/* Statistiques globales */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="text-xs text-blue-600 font-medium mb-1">Total Clics</div>
+                <div className="text-xs text-blue-600 font-medium mb-1">{t('clickbank.totalClicks')}</div>
                 <div className="text-2xl font-bold text-blue-700">
                   {clicksData.data.reduce((sum, item) => sum + item.hops, 0)}
                 </div>
               </div>
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="text-xs text-green-600 font-medium mb-1">Total Ventes</div>
+                <div className="text-xs text-green-600 font-medium mb-1">{t('clickbank.totalSales')}</div>
                 <div className="text-2xl font-bold text-green-700">
                   {clicksData.data.reduce((sum, item) => sum + item.sales, 0)}
                 </div>
               </div>
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <div className="text-xs text-purple-600 font-medium mb-1">Taux de Conversion</div>
+                <div className="text-xs text-purple-600 font-medium mb-1">{t('clickbank.conversionRate')}</div>
                 <div className="text-2xl font-bold text-purple-700">
                   {(() => {
                     const totalHops = clicksData.data.reduce((sum, item) => sum + item.hops, 0);
@@ -374,11 +374,11 @@ export default function Clickbank() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-100 border-b-2 border-gray-300">
-                    <th className="text-left p-3 text-sm font-semibold text-gray-700">Vendor</th>
-                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Clics</th>
-                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Ventes</th>
-                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Taux Conv.</th>
-                    <th className="text-right p-3 text-sm font-semibold text-gray-700">Revenus</th>
+                    <th className="text-left p-3 text-sm font-semibold text-gray-700">{t('clickbank.vendor')}</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">{t('clickbank.clicks')}</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">{t('clickbank.sales')}</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">{t('clickbank.convRate')}</th>
+                    <th className="text-right p-3 text-sm font-semibold text-gray-700">{t('clickbank.revenue')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -427,7 +427,7 @@ export default function Clickbank() {
             {/* JSON brut (collapsible) */}
             <details className="mt-4">
               <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 p-2 bg-gray-100 rounded">
-                📋 Voir les données JSON brutes
+                📋 {t('clickbank.viewRawData')}
               </summary>
               <pre className="mt-2 bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-96 border border-gray-200">
                 {JSON.stringify(clicksData, null, 2)}

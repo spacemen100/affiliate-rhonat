@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { getProducts, createProduct } from '../api/products';
 import { createAffiliateLink } from '../api/affiliate';
 import { createBrand, getBrands } from '../api/brands';
-import Sidebar from '../components/Sidebar';
 import Toast from '../components/Toast';
 import { useTranslation } from 'react-i18next';
 
@@ -118,135 +117,132 @@ export default function Products() {
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="p-6 w-full space-y-6">
-        {toast && (
-          <div className="fixed top-4 right-4 z-50">
-            <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+    <main className="p-6 w-full space-y-6">
+      {toast && (
+        <div className="fixed top-4 right-4 z-50">
+          <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        </div>
+      )}
+      <h1 className="text-2xl font-bold">{t('products.title')}</h1>
+
+      <div className="bg-white p-4 rounded shadow space-y-3">
+        <h2 className="text-lg font-semibold">{t('products.createBrand')}</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            className="border p-2 rounded"
+            placeholder={t('products.brandName')}
+            value={brandForm.name}
+            onChange={(e) => setBrandForm({ ...brandForm, name: e.target.value })}
+          />
+          <input
+            className="border p-2 rounded"
+            placeholder={t('products.domain')}
+            value={brandForm.domain}
+            onChange={(e) => setBrandForm({ ...brandForm, domain: e.target.value })}
+          />
+        </div>
+        <button
+          className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          onClick={handleCreateBrand}
+          disabled={creatingBrand}
+        >
+          {creatingBrand ? t('common.loading') : t('products.createBrand')}
+        </button>
+        <p className="text-sm text-gray-600">
+          {t('products.createBrandHint')}
+        </p>
+      </div>
+
+      <div className="bg-white p-4 rounded shadow space-y-3">
+        <h2 className="text-lg font-semibold">{t('products.createProduct')}</h2>
+        {brands.length === 0 && (
+          <div className="p-3 bg-yellow-50 text-yellow-800 rounded text-sm">
+            {t('products.noBrandWarning')}
           </div>
         )}
-        <h1 className="text-2xl font-bold">{t('products.title')}</h1>
-
-        <div className="bg-white p-4 rounded shadow space-y-3">
-          <h2 className="text-lg font-semibold">Créer une marque</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className="border p-2 rounded"
-              placeholder="Nom de la marque"
-              value={brandForm.name}
-              onChange={(e) => setBrandForm({ ...brandForm, name: e.target.value })}
-            />
-            <input
-              className="border p-2 rounded"
-              placeholder="Domaine (ex: brand.com)"
-              value={brandForm.domain}
-              onChange={(e) => setBrandForm({ ...brandForm, domain: e.target.value })}
-            />
-          </div>
-          <button
-            className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-            onClick={handleCreateBrand}
-            disabled={creatingBrand}
+        <div className="grid grid-cols-2 gap-3">
+          <input
+            className="border p-2 rounded"
+            placeholder={t('products.productName')}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            disabled={brands.length === 0}
+          />
+          <select
+            className="border p-2 rounded"
+            value={form.brand_id}
+            onChange={(e) => setForm({ ...form, brand_id: e.target.value })}
+            disabled={brands.length === 0}
           >
-            {creatingBrand ? t('common.loading') : t('products.createProduct')}
-          </button>
-          <p className="text-sm text-gray-600">
-            Crée au moins une marque pour alimenter la liste déroulante des produits.
-          </p>
+            <option value="">{t('products.selectBrand')}</option>
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+          <input
+            className="border p-2 rounded"
+            placeholder={t('products.price')}
+            type="number"
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            disabled={brands.length === 0}
+          />
+          <input
+            className="border p-2 rounded"
+            placeholder={t('products.commission')}
+            type="number"
+            value={form.commission_percent}
+            onChange={(e) => setForm({ ...form, commission_percent: e.target.value })}
+            disabled={brands.length === 0}
+          />
+          <input
+            className="border p-2 rounded col-span-2"
+            placeholder={t('products.landingUrl')}
+            value={form.landing_url}
+            onChange={(e) => setForm({ ...form, landing_url: e.target.value })}
+            disabled={brands.length === 0}
+          />
         </div>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          onClick={handleCreateProduct}
+          disabled={creatingProduct || brands.length === 0}
+        >
+          {creatingProduct ? t('common.loading') : t('products.createProduct')}
+        </button>
+      </div>
 
-        <div className="bg-white p-4 rounded shadow space-y-3">
-          <h2 className="text-lg font-semibold">Créer un nouveau produit</h2>
-          {brands.length === 0 && (
-            <div className="p-3 bg-yellow-50 text-yellow-800 rounded text-sm">
-              Aucune marque disponible. Crée une marque ci-dessus pour activer le formulaire produit.
+      {loading && <div className="text-gray-600 mb-2">{t('common.loading')}</div>}
+      {!loading && products.length === 0 && (
+        <div className="bg-white p-4 rounded shadow text-gray-600">{t('products.noProducts')}</div>
+      )}
+
+      <div className="grid grid-cols-3 gap-4">
+        {products.map((p) => (
+          <div key={p.id} className="bg-white shadow p-4 rounded flex flex-col gap-2">
+            <div>
+              <h2 className="font-semibold text-lg mb-1">{p.name}</h2>
+              <p className="text-gray-700 mb-1">{p.price}€</p>
+              <p className="text-sm text-gray-500">{t('products.commission')} : {p.commission_percent}%</p>
             </div>
-          )}
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className="border p-2 rounded"
-              placeholder="Nom du produit"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              disabled={brands.length === 0}
-            />
-            <select
-              className="border p-2 rounded"
-              value={form.brand_id}
-              onChange={(e) => setForm({ ...form, brand_id: e.target.value })}
-              disabled={brands.length === 0}
+            <Link
+              to={`/products/${p.id}`}
+              className="text-blue-600 text-sm underline underline-offset-2"
             >
-              <option value="">Sélectionner une marque</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            <input
-              className="border p-2 rounded"
-              placeholder="Prix (€)"
-              type="number"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-              disabled={brands.length === 0}
-            />
-            <input
-              className="border p-2 rounded"
-              placeholder="Commission (%)"
-              type="number"
-              value={form.commission_percent}
-              onChange={(e) => setForm({ ...form, commission_percent: e.target.value })}
-              disabled={brands.length === 0}
-            />
-            <input
-              className="border p-2 rounded col-span-2"
-              placeholder="URL de destination"
-              value={form.landing_url}
-              onChange={(e) => setForm({ ...form, landing_url: e.target.value })}
-              disabled={brands.length === 0}
-            />
+              {t('products.viewDetails')}
+            </Link>
+            <button
+              className="bg-green-600 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
+              onClick={() => handleCreateLink(p.id)}
+              disabled={creatingLinkId === p.id}
+            >
+              {creatingLinkId === p.id ? t('common.loading') : t('links.createLink')}
+            </button>
           </div>
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-            onClick={handleCreateProduct}
-            disabled={creatingProduct || brands.length === 0}
-          >
-            {creatingProduct ? t('common.loading') : t('products.createProduct')}
-          </button>
-        </div>
-
-        {loading && <div className="text-gray-600 mb-2">{t('common.loading')}</div>}
-        {!loading && products.length === 0 && (
-          <div className="bg-white p-4 rounded shadow text-gray-600">{t('products.noProducts')}</div>
-        )}
-
-        <div className="grid grid-cols-3 gap-4">
-          {products.map((p) => (
-            <div key={p.id} className="bg-white shadow p-4 rounded flex flex-col gap-2">
-              <div>
-                <h2 className="font-semibold text-lg mb-1">{p.name}</h2>
-                <p className="text-gray-700 mb-1">{p.price}€</p>
-                <p className="text-sm text-gray-500">Commission: {p.commission_percent}%</p>
-              </div>
-              <Link
-                to={`/products/${p.id}`}
-                className="text-blue-600 text-sm underline underline-offset-2"
-              >
-                Voir le détail
-              </Link>
-              <button
-                className="bg-green-600 text-white px-3 py-2 rounded text-sm disabled:opacity-60"
-                onClick={() => handleCreateLink(p.id)}
-                disabled={creatingLinkId === p.id}
-              >
-                {creatingLinkId === p.id ? t('common.loading') : t('links.createLink')}
-              </button>
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
+        ))}
+      </div>
+    </main>
   );
 }

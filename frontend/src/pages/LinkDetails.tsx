@@ -76,16 +76,16 @@ export default function LinkDetails() {
         <div className="bg-white rounded shadow p-4 space-y-2">
           <p className="text-xs text-gray-500">{t('links.linkDetails')}</p>
           <h1 className="text-2xl font-bold break-all">{goUrl}</h1>
-          <p className="text-sm text-gray-500">Code : {link.code}</p>
+          <p className="text-sm text-gray-500">{t('links.code')} : {link.code}</p>
           <p className="text-sm text-gray-500">
-            Créé le {link.created_at ? new Date(link.created_at).toLocaleDateString() : '—'}
+            {t('links.created')} {link.created_at ? new Date(link.created_at).toLocaleDateString() : '—'}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded shadow p-4 space-y-2">
             <p className="text-xs text-gray-500">{t('links.product')}</p>
-            <h2 className="text-lg font-semibold">{product?.name ?? 'Produit'}</h2>
+            <h2 className="text-lg font-semibold">{product?.name ?? t('common.product')}</h2>
             <p className="text-sm text-gray-600">{product?.price}€ — {product?.commission_percent}%</p>
             {product?.landing_url && (
               <a
@@ -94,14 +94,14 @@ export default function LinkDetails() {
                 rel="noreferrer"
                 className="text-blue-600 underline underline-offset-2 text-sm break-all"
               >
-                Page de destination
+                {t('products.landingUrl')}
               </a>
             )}
           </div>
 
           <div className="bg-white rounded shadow p-4 space-y-2">
             <p className="text-xs text-gray-500">{t('nav.brand')}</p>
-            <h2 className="text-lg font-semibold">{brand?.name ?? 'Marque'}</h2>
+            <h2 className="text-lg font-semibold">{brand?.name ?? t('nav.brand')}</h2>
             {brand?.domain && (
               <a
                 href={`https://${brand.domain}`}
@@ -115,8 +115,8 @@ export default function LinkDetails() {
           </div>
 
           <div className="bg-white rounded shadow p-4 space-y-2">
-            <p className="text-xs text-gray-500">Influenceur</p>
-            <h2 className="text-lg font-semibold">{affiliate?.display_name ?? 'Affilié'}</h2>
+            <p className="text-xs text-gray-500">{t('links.influencer')}</p>
+            <h2 className="text-lg font-semibold">{affiliate?.display_name ?? t('topAffiliates.affiliate')}</h2>
             <p className="text-sm text-gray-600">ID : {affiliate?.id ?? '—'}</p>
           </div>
         </div>

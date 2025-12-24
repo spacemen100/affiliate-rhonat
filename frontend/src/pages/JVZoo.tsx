@@ -53,7 +53,7 @@ export default function JVZoo() {
     setTimeout(() => {
       setSaving(false);
       setToast({
-        message: "Identifiants JVZoo sauvegardés localement. L'UUID/affiliateId identifie l'influenceur.",
+        message: t('jvzoo.success.credentialsSaved'),
         type: 'success',
       });
     }, 300);
@@ -61,7 +61,7 @@ export default function JVZoo() {
 
   async function handleTest() {
     if (!credentials.apiKey) {
-      setToast({ message: 'La JVZoo API Key est requise.', type: 'error' });
+      setToast({ message: t('jvzoo.errors.apiKeyRequired'), type: 'error' });
       return;
     }
     setTesting(true);
@@ -77,11 +77,11 @@ export default function JVZoo() {
       setConnectionStatus(result.ok ? 'success' : 'error');
       if (result.payload) setConnectionPayload(result.payload);
       if (result.error) setConnectionError(result.error);
-      setToast({ message: result.ok ? 'Connexion JVZoo réussie !' : 'Connexion JVZoo échouée', type: result.ok ? 'success' : 'error' });
+      setToast({ message: result.ok ? t('jvzoo.success.connectionSuccess') : t('jvzoo.errors.connectionFailed'), type: result.ok ? 'success' : 'error' });
     } catch (error: any) {
       setConnectionStatus('error');
       setConnectionError(error?.message || String(error));
-      setToast({ message: `Erreur: ${error.message}`, type: 'error' });
+      setToast({ message: `${t('common.error')}: ${error.message}`, type: 'error' });
     } finally {
       setTesting(false);
     }
@@ -89,7 +89,7 @@ export default function JVZoo() {
 
   async function handleLoadOffers() {
     if (!credentials.apiKey) {
-      setToast({ message: 'Veuillez entrer votre API Key JVZoo', type: 'error' });
+      setToast({ message: t('jvzoo.errors.enterApiKey'), type: 'error' });
       return;
     }
     setLoadingOffers(true);
@@ -101,9 +101,9 @@ export default function JVZoo() {
         affiliateId: credentials.affiliateId,
       });
       setOffers(data);
-      setToast({ message: `${data.length} offre(s) JVZoo récupérée(s).`, type: 'success' });
+      setToast({ message: t('jvzoo.success.offersRetrieved', { count: data.length }), type: 'success' });
     } catch (error: any) {
-      setToast({ message: `Erreur: ${error.message}`, type: 'error' });
+      setToast({ message: `${t('common.error')}: ${error.message}`, type: 'error' });
     } finally {
       setLoadingOffers(false);
     }
@@ -111,7 +111,7 @@ export default function JVZoo() {
 
   async function handleCreateLink() {
     if (!selectedProduct) {
-      setToast({ message: 'Choisissez un produit JVZoo.', type: 'error' });
+      setToast({ message: t('jvzoo.errors.selectProduct'), type: 'error' });
       return;
     }
     try {
@@ -125,9 +125,9 @@ export default function JVZoo() {
         trackingId || undefined
       );
       setCreatedLink(link.url);
-      setToast({ message: 'Lien JVZoo créé avec succès !', type: 'success' });
+      setToast({ message: t('jvzoo.success.linkCreated'), type: 'success' });
     } catch (error: any) {
-      setToast({ message: `Erreur: ${error.message}`, type: 'error' });
+      setToast({ message: `${t('common.error')}: ${error.message}`, type: 'error' });
     }
   }
 
@@ -137,7 +137,7 @@ export default function JVZoo() {
     <main className="page-surface p-6 w-full flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm text-gray-500 font-medium">Connecteur partenaires</p>
+          <p className="text-sm text-gray-500 font-medium">{t('jvzoo.partnerConnector')}</p>
           <h1 className="text-2xl font-bold">{t('jvzoo.title')}</h1>
         </div>
         <a
@@ -146,7 +146,7 @@ export default function JVZoo() {
           target="_blank"
           rel="noreferrer"
         >
-          Portail JVZoo
+          {t('jvzoo.portal')}
         </a>
       </div>
 
@@ -155,40 +155,39 @@ export default function JVZoo() {
       <section className="card p-5 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Identifiants API</h2>
+            <h2 className="text-lg font-semibold">{t('jvzoo.apiCredentials')}</h2>
             <p className="text-sm text-gray-600">
-              API Key JVZoo (obtenue depuis l&apos;onglet Applications), API Secret si requis, et l&apos;UUID de
-              l&apos;influenceur comme affiliateId.
+              {t('jvzoo.apiCredentialsDesc')}
             </p>
           </div>
           <button onClick={handleTest} disabled={testing} className="btn-primary text-sm">
-            {testing ? 'Test en cours...' : 'Tester la connexion'}
+            {testing ? t('jvzoo.testing') : t('jvzoo.testConnection')}
           </button>
         </div>
         <form className="grid grid-cols-1 md:grid-cols-3 gap-4" onSubmit={handleSave}>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">API Key *</span>
+            <span className="text-sm font-medium text-gray-700">{t('jvzoo.apiKey')} *</span>
             <input
               className="input"
-              placeholder="Clé JVZoo"
+              placeholder={t('jvzoo.jvzooKey')}
               value={credentials.apiKey}
               onChange={(e) => handleChange('apiKey', e.target.value)}
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">API Secret (optionnel)</span>
+            <span className="text-sm font-medium text-gray-700">{t('jvzoo.apiSecret')}</span>
             <input
               className="input"
-              placeholder="Secret JVZoo"
+              placeholder={t('jvzoo.jvzooSecret')}
               value={credentials.apiSecret}
               onChange={(e) => handleChange('apiSecret', e.target.value)}
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">Influenceur / UUID</span>
+            <span className="text-sm font-medium text-gray-700">{t('jvzoo.influencerUuid')}</span>
             <input
               className="input"
-              placeholder="UUID de l'influenceur"
+              placeholder={t('jvzoo.influencerUuidPlaceholder')}
               value={credentials.affiliateId}
               onChange={(e) => handleChange('affiliateId', e.target.value)}
             />
@@ -201,18 +200,18 @@ export default function JVZoo() {
         </form>
         {connectionStatus !== 'idle' && (
           <div className={`p-3 rounded-lg ${connectionStatus === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-            {connectionStatus === 'success' ? '✅ Connexion réussie' : '❌ Connexion échouée'}
+            {connectionStatus === 'success' ? `✅ ${t('jvzoo.connectionSuccess')}` : `❌ ${t('jvzoo.connectionFailed')}`}
           </div>
         )}
         {connectionPayload && (
           <div className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs max-h-64">
-            <div className="font-semibold mb-2">Réponse JSON de l'API JVZoo</div>
+            <div className="font-semibold mb-2">{t('jvzoo.apiResponse')}</div>
             <pre className="whitespace-pre-wrap">{JSON.stringify(connectionPayload, null, 2)}</pre>
           </div>
         )}
         {connectionError && (
           <div className="bg-red-50 p-4 rounded-lg text-xs text-red-800">
-            <div className="font-semibold mb-2">Erreur</div>
+            <div className="font-semibold mb-2">{t('common.error')}</div>
             {connectionError}
           </div>
         )}
@@ -221,8 +220,8 @@ export default function JVZoo() {
       <section className="card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Produits JVZoo</h2>
-            <p className="text-sm text-gray-600">Récupérez les offres disponibles depuis l'API JVZoo.</p>
+            <h2 className="text-lg font-semibold">{t('jvzoo.jvzooProducts')}</h2>
+            <p className="text-sm text-gray-600">{t('jvzoo.jvzooProductsDesc')}</p>
           </div>
           <button onClick={handleLoadOffers} disabled={loadingOffers} className="btn-ghost text-sm">
             {loadingOffers ? t('common.loading') : t('common.refresh')}
@@ -246,28 +245,28 @@ export default function JVZoo() {
             </label>
           ))}
         </div>
-        {!offers.length && !loadingOffers && <p className="text-sm text-gray-600">Aucune offre disponible. Cliquez sur "Rafraîchir" pour charger les offres.</p>}
+        {!offers.length && !loadingOffers && <p className="text-sm text-gray-600">{t('jvzoo.noOffers')}</p>}
       </section>
 
       <section className="card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Créer un lien d&apos;affiliation JVZoo</h2>
+            <h2 className="text-lg font-semibold">{t('jvzoo.createAffiliateLink')}</h2>
             <p className="text-sm text-gray-600">
-              Associez le produit JVZoo sélectionné avec votre UUID d&apos;influenceur et un Tracking ID.
+              {t('jvzoo.createAffiliateLinkDesc')}
             </p>
           </div>
           <button onClick={handleCreateLink} className="btn-primary text-sm">
-            Générer le lien
+            {t('jvzoo.generateLink')}
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">Produit sélectionné</span>
-            <input className="input" value={selectedProduct} readOnly placeholder="Choisissez un produit ci-dessus" />
+            <span className="text-sm font-medium text-gray-700">{t('jvzoo.selectedProduct')}</span>
+            <input className="input" value={selectedProduct} readOnly placeholder={t('jvzoo.selectProductAbove')} />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-700">Tracking ID (optionnel)</span>
+            <span className="text-sm font-medium text-gray-700">{t('jvzoo.trackingId')}</span>
             <input
               className="input"
               placeholder="campagne_xyz"
@@ -278,7 +277,7 @@ export default function JVZoo() {
         </div>
         {createdLink && (
           <div className="bg-green-50 p-4 rounded-lg space-y-2">
-            <p className="text-sm font-semibold">Lien généré</p>
+            <p className="text-sm font-semibold">{t('jvzoo.generatedLink')}</p>
             <code className="text-xs bg-white p-2 rounded block break-all">{createdLink}</code>
           </div>
         )}

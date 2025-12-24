@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
 import { getAdminAggregates, AdminAggregates } from '../api/admin';
 import { useTranslation } from 'react-i18next';
 
@@ -20,62 +19,59 @@ export default function AdminReports() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Sidebar />
-      <div className="p-8 w-full flex flex-col gap-6">
-        <header className="flex flex-col gap-2">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Rapports</p>
-          <h1 className="text-3xl font-bold text-slate-900">Admin — Clics / Ventes / Revenus</h1>
-          <p className="text-sm text-slate-600 max-w-3xl">
-            Vue agrégée par marque, produit et affilié pour suivre l’impact de vos campagnes en un clin d’œil.
-          </p>
-        </header>
+    <div className="p-8 w-full flex flex-col gap-6">
+      <header className="flex flex-col gap-2">
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{t('adminReports.title')}</p>
+        <h1 className="text-3xl font-bold text-slate-900">{t('adminReports.subtitle')}</h1>
+        <p className="text-sm text-slate-600 max-w-3xl">
+          {t('adminReports.description')}
+        </p>
+      </header>
 
-        {loading && <div className="rounded-xl bg-white shadow p-4 text-sm text-slate-600">{t('common.loading')}</div>}
-        {error && <div className="rounded-xl bg-red-50 text-red-700 border border-red-100 p-4">{t('common.error')} : {error}</div>}
-        {data && (
-          <div className="flex flex-col gap-6">
-            <Section
-              title="Par marque"
-              accent="from-sky-500 to-sky-600"
-              rows={data.by_brand}
-              entityLabel="marque"
-              columns={[
-                { key: 'brand_name', label: 'Marque' },
-                { key: 'clicks', label: 'Clics' },
-                { key: 'sales', label: 'Ventes' },
-                { key: 'revenue', label: 'Revenus (€)' },
-              ]}
-            />
+      {loading && <div className="rounded-xl bg-white shadow p-4 text-sm text-slate-600">{t('common.loading')}</div>}
+      {error && <div className="rounded-xl bg-red-50 text-red-700 border border-red-100 p-4">{t('common.error')} : {error}</div>}
+      {data && (
+        <div className="flex flex-col gap-6">
+          <Section
+            title={t('adminReports.byBrand')}
+            accent="from-sky-500 to-sky-600"
+            rows={data.by_brand}
+            entityLabel={t('adminReports.brand')}
+            columns={[
+              { key: 'brand_name', label: t('adminReports.brand') },
+              { key: 'clicks', label: t('adminReports.clicks') },
+              { key: 'sales', label: t('adminReports.sales') },
+              { key: 'revenue', label: t('adminReports.revenue') },
+            ]}
+          />
 
-            <Section
-              title="Par produit"
-              accent="from-indigo-500 to-indigo-600"
-              rows={data.by_product}
-              entityLabel="produit"
-              columns={[
-                { key: 'product_name', label: 'Produit' },
-                { key: 'clicks', label: 'Clics' },
-                { key: 'sales', label: 'Ventes' },
-                { key: 'revenue', label: 'Revenus (€)' },
-              ]}
-            />
+          <Section
+            title={t('adminReports.byProduct')}
+            accent="from-indigo-500 to-indigo-600"
+            rows={data.by_product}
+            entityLabel={t('adminReports.product')}
+            columns={[
+              { key: 'product_name', label: t('adminReports.product') },
+              { key: 'clicks', label: t('adminReports.clicks') },
+              { key: 'sales', label: t('adminReports.sales') },
+              { key: 'revenue', label: t('adminReports.revenue') },
+            ]}
+          />
 
-            <Section
-              title="Par affilié"
-              accent="from-amber-500 to-amber-600"
-              rows={data.by_affiliate}
-              entityLabel="affilié"
-              columns={[
-                { key: 'display_name', label: 'Affilié' },
-                { key: 'clicks', label: 'Clics' },
-                { key: 'sales', label: 'Ventes' },
-                { key: 'revenue', label: 'Revenus (€)' },
-              ]}
-            />
-          </div>
-        )}
-      </div>
+          <Section
+            title={t('adminReports.byAffiliate')}
+            accent="from-amber-500 to-amber-600"
+            rows={data.by_affiliate}
+            entityLabel={t('adminReports.affiliate')}
+            columns={[
+              { key: 'display_name', label: t('adminReports.affiliate') },
+              { key: 'clicks', label: t('adminReports.clicks') },
+              { key: 'sales', label: t('adminReports.sales') },
+              { key: 'revenue', label: t('adminReports.revenue') },
+            ]}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -95,6 +91,7 @@ function Section({
   accent: string;
   entityLabel: string;
 }) {
+  const { t } = useTranslation();
   const totals = getTotals(rows);
   const topPerformer = getTopPerformer(rows, columns[0]?.key, 'revenue');
 
@@ -102,24 +99,24 @@ function Section({
     <div className="rounded-2xl bg-white shadow-lg border border-slate-100 overflow-hidden flex flex-col">
       <div className={`px-5 py-4 bg-gradient-to-r ${accent} text-white flex items-center justify-between`}>
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] opacity-80">Synthèse</p>
+          <p className="text-xs uppercase tracking-[0.25em] opacity-80">{t('adminReports.summary')}</p>
           <h2 className="text-lg font-semibold">{title}</h2>
         </div>
         <div className="flex items-center gap-3">
-          <Badge label="Clics" value={totals.clicks} tone="bg-white/15" />
-          <Badge label="Ventes" value={totals.sales} tone="bg-white/15" />
-          <Badge label="Revenus" value={`€${totals.revenue.toFixed(2)}`} tone="bg-white/15" />
+          <Badge label={t('adminReports.clicks')} value={totals.clicks} tone="bg-white/15" />
+          <Badge label={t('adminReports.sales')} value={totals.sales} tone="bg-white/15" />
+          <Badge label={t('dashboard.revenue')} value={`€${totals.revenue.toFixed(2)}`} tone="bg-white/15" />
         </div>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-slate-500 px-5 py-6 bg-slate-50">Aucune donnée pour cette section.</p>
+        <p className="text-sm text-slate-500 px-5 py-6 bg-slate-50">{t('adminReports.noData')}</p>
       ) : (
         <>
           {topPerformer && (
             <div className="px-5 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-xs uppercase text-slate-500 tracking-wide">Meilleure {entityLabel}</span>
+                <span className="text-xs uppercase text-slate-500 tracking-wide">{t('adminReports.topPerformer')} {entityLabel}</span>
                 <span className="text-base font-semibold text-slate-900">{topPerformer.name}</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-700">
@@ -127,7 +124,7 @@ function Section({
                   €{topPerformer.revenue.toFixed(2)}
                 </span>
                 <span className="px-3 py-1 rounded-full bg-slate-200 text-slate-700">
-                  {topPerformer.sales} ventes
+                  {topPerformer.sales} {t('adminReports.sales').toLowerCase()}
                 </span>
               </div>
             </div>

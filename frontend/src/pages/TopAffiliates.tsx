@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getTopAffiliates } from '../api/affiliates';
 import AffiliateRankCard from '../components/marketplace/AffiliateRankCard';
-import Sidebar from '../components/Sidebar';
 import { useTranslation } from 'react-i18next';
 
 export default function TopAffiliates() {
@@ -39,14 +38,14 @@ export default function TopAffiliates() {
           <span className="text-sm text-gray-500">Top 10</span>
         </div>
         {items.length === 0 ? (
-          <div className="p-4 text-gray-600">Pas encore de données. Commence à générer des ventes/clics.</div>
+          <div className="p-4 text-gray-600">{t('topAffiliates.noDataYet')}</div>
         ) : (
           <ol className="divide-y">
             {items.map((a, idx) => (
               <li key={a.affiliate_id} className="p-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="w-6 text-gray-500">{idx + 1}.</span>
-                  <span className="font-semibold">{a.display_name || 'Anonyme'}</span>
+                  <span className="font-semibold">{a.display_name || t('topAffiliates.anonymous')}</span>
                 </div>
                 <div className="text-sm font-semibold text-gray-800">
                   {metricKey === 'total_revenue' ? `${a[metricKey] ?? 0}€` : a[metricKey] ?? 0}
@@ -60,36 +59,33 @@ export default function TopAffiliates() {
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="p-6 w-full">
-        <h1 className="text-2xl font-bold mb-6">{t('topAffiliates.title')}</h1>
-        {loading && <div className="text-gray-600">{t('common.loading')}</div>}
-        {!loading && error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded border border-red-200">{error}</div>
-        )}
-        {!loading && !error && list.length === 0 && (
-          <div className="bg-white p-4 rounded shadow text-gray-600">
-            Pas encore de top affiliés. Commence à générer des ventes pour apparaître ici.
-          </div>
-        )}
+    <main className="p-6 w-full">
+      <h1 className="text-2xl font-bold mb-6">{t('topAffiliates.title')}</h1>
+      {loading && <div className="text-gray-600">{t('common.loading')}</div>}
+      {!loading && error && (
+        <div className="bg-red-50 text-red-700 p-4 rounded border border-red-200">{error}</div>
+      )}
+      {!loading && !error && list.length === 0 && (
+        <div className="bg-white p-4 rounded shadow text-gray-600">
+          {t('topAffiliates.noAffiliates')}
+        </div>
+      )}
 
-        {!loading && !error && list.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            {renderSimpleList(topClicks, 'clicks_count', 'Classement par clics')}
-            {renderSimpleList(topSales, 'sales_count', 'Classement par ventes')}
-            {renderSimpleList(topRevenue, 'total_revenue', 'Classement par chiffre d’affaires')}
-          </div>
-        )}
+      {!loading && !error && list.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+          {renderSimpleList(topClicks, 'clicks_count', t('topAffiliates.rankByClicks'))}
+          {renderSimpleList(topSales, 'sales_count', t('topAffiliates.rankBySales'))}
+          {renderSimpleList(topRevenue, 'total_revenue', t('topAffiliates.rankByRevenue'))}
+        </div>
+      )}
 
-        {!loading && !error && list.length > 0 && (
-          <div className="flex flex-col gap-4">
-            {list.slice(0, 10).map((a) => (
-              <AffiliateRankCard key={a.affiliate_id} a={a} />
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+      {!loading && !error && list.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {list.slice(0, 10).map((a) => (
+            <AffiliateRankCard key={a.affiliate_id} a={a} />
+          ))}
+        </div>
+      )}
+    </main>
   );
 }

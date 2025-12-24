@@ -19,7 +19,7 @@ export default function Navbar() {
       <div className="hidden md:flex items-center gap-3">
         <span className="badge-soft">Beta</span>
         <LanguageSwitcher />
-        <button type="button" className="btn-ghost text-sm">Centre d'aide</button>
+        <button type="button" className="btn-ghost text-sm">{t('common.helpCenter')}</button>
       </div>
     </nav>
   );
